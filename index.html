@@ -24,6 +24,7 @@ main.nodock{padding-bottom:96px}
 body{overflow-x:hidden}
 h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:8px 0 2px}
 .sub{color:var(--muted);margin:0 0 12px}
+.logo{position:absolute;top:24px;right:16px;width:32px;height:32px;fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;z-index:2}
 h2{font-size:15px;font-weight:600;color:var(--muted);margin:22px 0 8px}
 nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
 nav button{flex:1;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;background:none;border:0;font:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer}
@@ -141,6 +142,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="wm">Mes courses</div>
 </div>
 <main>
+  <svg class="logo" viewBox="0 0 96 96" aria-hidden="true"><path d="M34 40V32a14 14 0 0 1 28 0V40"/><path d="M20 40H76L69 74a4 4 0 0 1-4 3H31a4 4 0 0 1-4-3Z"/><path d="M38 57L46 65L60 49"/></svg>
   <section id="v-liste">
     <h1>Ma liste</h1>
     <p class="sub" id="resume"></p>
@@ -302,7 +304,7 @@ function renderList(){
     h.appendChild(el("span",null,c));h.appendChild(el("span","n",nd+"/"+items.length));
     box.appendChild(h);
     items.forEach(function(i){
-      var r=el("div","li"+(i.done?" done":""));
+      var r=el("div","li"+(i.done?" done":""));r.dataset.id=i.id;
       var b=el("button","box",i.done?"✓":"");b.dataset.act="toggle";b.dataset.id=i.id;b.setAttribute("aria-label","Cocher "+i.name);
       var n=el("span","name");n.appendChild(el("span","tx",i.name));n.dataset.act="toggle";n.dataset.id=i.id;
       var d=el("button","del","×");d.dataset.act="remove";d.dataset.id=i.id;d.setAttribute("aria-label","Retirer "+i.name);
@@ -314,6 +316,18 @@ function renderList(){
       q.appendChild(p);
       r.appendChild(b);r.appendChild(n);r.appendChild(q);r.appendChild(d);box.appendChild(r);
     });
+  });
+}
+function renderFlip(){
+  var first={};
+  document.querySelectorAll("#list .li").forEach(function(r){first[r.dataset.id]=r.getBoundingClientRect().top});
+  render();
+  if(RM)return;
+  document.querySelectorAll("#list .li").forEach(function(r){
+    var f=first[r.dataset.id];if(f==null)return;
+    var dy=f-r.getBoundingClientRect().top;
+    if(Math.abs(dy)<1)return;
+    r.animate([{transform:"translateY("+dy+"px)"},{transform:"none"}],{duration:420,easing:"cubic-bezier(.3,.7,.2,1)"});
   });
 }
 function fillSugg(){
@@ -388,7 +402,7 @@ document.addEventListener("click",function(e){
     if(row&&it&&!RM){
       row.classList.toggle("done",it.done);
       row.querySelector(".box").textContent=it.done?"✓":"";
-      clearTimeout(window._rt);window._rt=setTimeout(render,500);
+      clearTimeout(window._rt);window._rt=setTimeout(renderFlip,500);
     }else render();
   }
   else if(a==="showadd"){var rw=t.nextSibling;t.hidden=true;rw.hidden=false;rw.firstChild.focus()}
