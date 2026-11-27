@@ -24,6 +24,20 @@ main.nodock{padding-bottom:96px}
 body{overflow-x:hidden}
 h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:8px 0 2px}
 .sub{color:var(--muted);margin:0 0 12px}
+.subrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+.subrow .sub{margin:0}
+.pill{font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;flex:none}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pill:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.qn{display:none;color:var(--muted);font-size:.8em;margin-left:6px}
+body.store .li{min-height:68px;font-size:22px}
+body.store .li .box{width:34px;height:34px;font-size:20px}
+body.store .qty,body.store .li .del{display:none}
+body.store .qn{display:inline}
+body.store .grp{font-size:15px}
+body.store #dock .addr{display:none}
+.folder.drag{position:relative;z-index:3;border-color:var(--ink)}
+#chips summary{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .logo{position:absolute;top:24px;right:16px;width:32px;height:32px;fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;z-index:2}
 h2{font-size:15px;font-weight:600;color:var(--muted);margin:22px 0 8px}
 nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
@@ -145,13 +159,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <svg class="logo" viewBox="0 0 96 96" aria-hidden="true"><path d="M34 40V32a14 14 0 0 1 28 0V40"/><path d="M20 40H76L69 74a4 4 0 0 1-4 3H31a4 4 0 0 1-4-3Z"/><path d="M38 57L46 65L60 49"/></svg>
   <section id="v-liste">
     <h1>Ma liste</h1>
-    <p class="sub" id="resume"></p>
+    <div class="subrow"><p class="sub" id="resume"></p><button class="pill" id="storeBtn" aria-pressed="false">Mode magasin</button></div>
     <div class="bar"><i id="barfill"></i></div>
     <div id="list"></div>
   </section>
   <section id="v-produits" hidden>
     <h1>Mes produits</h1>
-    <p class="sub">Cochez un produit pour l’ajouter à votre liste.</p>
+    <p class="sub">Cochez un produit pour l’ajouter à votre liste. Maintenez un rayon pour le déplacer.</p>
     <div id="chips"></div>
   </section>
   <section id="v-recettes" hidden>
@@ -168,6 +182,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
       <div id="rDraft"></div>
       <button class="main" id="rSave">Enregistrer la recette</button>
+      <button class="ghost" id="rCancel" style="margin-top:0">Annuler</button>
     </div>
   </section>
 </main>
@@ -258,13 +273,68 @@ function fold(d){
 document.addEventListener("click",function(e){
   var s=e.target.closest&&e.target.closest("details.folder>summary");
   if(!s)return;
+  if(NOCLICK){e.preventDefault();return}
   e.preventDefault();
   var d=s.parentNode;
   if(d.open&&!d._closing)fold(d);else unfold(d);
 });
+var NOCLICK=false,DR=null,LP=null,STORE=false,WL=null;
+function ORD(){var o=(S.order||[]).filter(function(c){return CATS.indexOf(c)>=0});CATS.forEach(function(c){if(o.indexOf(c)<0)o.push(c)});return o}
+function pxy(e){var t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;return {x:t.clientX,y:t.clientY}}
+function dStart(e){
+  if(e.type==="mousedown"&&e.button!==0)return;
+  var s=e.target.closest&&e.target.closest("#chips details.folder>summary");if(!s)return;
+  var p=pxy(e);
+  LP={f:s.parentNode,x:p.x,y:p.y,t:setTimeout(dBegin,450)};
+}
+function dBegin(){
+  var f=LP.f,cy=LP.y;
+  document.querySelectorAll("#chips details.folder").forEach(function(o){if(o._a)o._a.cancel();o._closing=false;o.classList.remove("closing");o.open=false});
+  OPEN={};
+  if(navigator.vibrate)navigator.vibrate(20);
+  f.classList.add("drag");
+  DR={f:f,sy:cy};LP=null;
+}
+function dMove(e){
+  var p=pxy(e);
+  if(LP){if(Math.abs(p.x-LP.x)>10||Math.abs(p.y-LP.y)>10){clearTimeout(LP.t);LP=null}else LP.y=p.y;return}
+  if(!DR)return;
+  if(e.cancelable)e.preventDefault();
+  var f=DR.f,cy=p.y;
+  f.style.transform="translateY("+(cy-DR.sy)+"px)";
+  var box=$("chips"),list=[].slice.call(box.children),r=f.getBoundingClientRect(),mid=r.top+r.height/2,before=null;
+  for(var i=0;i<list.length;i++){var o=list[i];if(o===f)continue;var q=o.getBoundingClientRect();if(mid<q.top+q.height/2){before=o;break}}
+  if(before===f.nextSibling)return;
+  var tops={};list.forEach(function(o){tops[fname(o)]=o.getBoundingClientRect().top});
+  var vt=r.top;
+  box.insertBefore(f,before);
+  f.style.transform="none";
+  var dy=vt-f.getBoundingClientRect().top;
+  f.style.transform="translateY("+dy+"px)";DR.sy=cy-dy;
+  list.forEach(function(o){if(o===f)return;var d2=tops[fname(o)]-o.getBoundingClientRect().top;if(Math.abs(d2)>1)o.animate([{transform:"translateY("+d2+"px)"},{transform:"none"}],{duration:200,easing:"ease-out"})});
+}
+function dEnd(e){
+  if(LP){clearTimeout(LP.t);LP=null;return}
+  if(!DR)return;
+  if(e.cancelable)e.preventDefault();
+  var f=DR.f,tr=f.style.transform;
+  f.style.transform="";f.classList.remove("drag");
+  if(!RM)f.animate([{transform:tr},{transform:"none"}],{duration:180,easing:"ease-out"});
+  S.order=[].slice.call($("chips").children).map(fname);
+  save();renderList();
+  DR=null;NOCLICK=true;setTimeout(function(){NOCLICK=false},350);
+}
+document.addEventListener("touchstart",dStart,{passive:true});
+document.addEventListener("mousedown",dStart);
+document.addEventListener("touchmove",dMove,{passive:false});
+document.addEventListener("mousemove",dMove);
+document.addEventListener("touchend",dEnd,{passive:false});
+document.addEventListener("touchcancel",dEnd);
+document.addEventListener("mouseup",dEnd);
+document.addEventListener("contextmenu",function(e){if(DR||LP||(e.target.closest&&e.target.closest("#chips summary")))e.preventDefault()});
 function renderChips(){
   var box=$("chips");box.textContent="";
-  CATS.forEach(function(c){
+  ORD().forEach(function(c){
     var items=S.habits.filter(function(h){return h.cat===c}).sort(function(a,b){return b.count-a.count||a.name.localeCompare(b.name)});
     var n=items.filter(function(h){return inList(h.name)}).length;
     var d=el("details","folder");
@@ -295,9 +365,9 @@ function renderList(){
   $("resume").textContent=total?done+" sur "+total+" dans le panier":"";
   $("finish").hidden=!done;$("finish").textContent="Terminer les courses ("+done+")";
   var tc=$("tabcount");tc.textContent=left;tc.hidden=!left;
-  if(!total){box.appendChild(el("div","empty","Votre liste est vide. Ajoutez un article ou choisissez-en dans l’onglet Produits."));return}
-  CATS.forEach(function(c){
-    var items=S.list.filter(function(i){return i.cat===c}).sort(function(a,b){return (a.done?1:0)-(b.done?1:0)});
+  if(!total||(STORE&&!left)){box.appendChild(el("div","empty",total?"Tout est dans le panier.":"Votre liste est vide. Ajoutez un article ou choisissez-en dans l’onglet Produits."));return}
+  ORD().forEach(function(c){
+    var items=S.list.filter(function(i){return i.cat===c&&!(STORE&&i.done)}).sort(function(a,b){return (a.done?1:0)-(b.done?1:0)});
     if(!items.length)return;
     var nd=items.filter(function(i){return i.done}).length;
     var h=el("div","grp");h.insertAdjacentHTML("afterbegin",ICONS[c]||ICONS["Autre"]);
@@ -306,7 +376,7 @@ function renderList(){
     items.forEach(function(i){
       var r=el("div","li"+(i.done?" done":""));r.dataset.id=i.id;
       var b=el("button","box",i.done?"✓":"");b.dataset.act="toggle";b.dataset.id=i.id;b.setAttribute("aria-label","Cocher "+i.name);
-      var n=el("span","name");n.appendChild(el("span","tx",i.name));n.dataset.act="toggle";n.dataset.id=i.id;
+      var n=el("span","name");n.appendChild(el("span","tx",i.name));if((i.qty||1)>1)n.appendChild(el("span","qn"," × "+i.qty));n.dataset.act="toggle";n.dataset.id=i.id;
       var d=el("button","del","×");d.dataset.act="remove";d.dataset.id=i.id;d.setAttribute("aria-label","Retirer "+i.name);
       var q=el("div","qty");
       var m=el("button",null,"−");m.dataset.act="qminus";m.dataset.id=i.id;m.setAttribute("aria-label","Moins de "+i.name);
@@ -344,7 +414,8 @@ function renderRecipes(){
     info.appendChild(n);
     info.appendChild(el("div","ing",r.items.map(function(i){return i.name}).join(", ")));
     var d=el("button","del","×");d.dataset.act="delreci";d.dataset.id=r.id;d.setAttribute("aria-label","Supprimer "+r.name);
-    c.appendChild(info);c.appendChild(d);box.appendChild(c);
+    var ed=el("button","del");ed.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg>';ed.dataset.act="editreci";ed.dataset.id=r.id;ed.setAttribute("aria-label","Modifier "+r.name);
+    c.appendChild(info);c.appendChild(ed);c.appendChild(d);box.appendChild(c);
   });
 }
 function useRecipe(id){
@@ -370,10 +441,23 @@ function addDraft(){
   DRAFT.push({name:v,cat:h?h.cat:$("rCat").value});
   $("rIng").value="";renderDraft();$("rIng").focus();
 }
+var EDIT=null;
+function closeForm(){
+  EDIT=null;DRAFT=[];$("rName").value="";$("rIng").value="";renderDraft();
+  $("recipeForm").hidden=true;$("newRecipeBtn").hidden=false;$("rSave").textContent="Enregistrer la recette";
+}
+function editRecipe(id){
+  var r=S.recipes.filter(function(x){return x.id===id})[0];if(!r)return;
+  EDIT=id;DRAFT=r.items.map(function(i){return {name:i.name,cat:i.cat}});
+  $("rName").value=r.name;renderDraft();
+  $("recipeForm").hidden=false;$("newRecipeBtn").hidden=true;$("rSave").textContent="Enregistrer les modifications";
+  $("recipeForm").scrollIntoView({behavior:"smooth",block:"center"});
+}
 function saveRecipe(){
   var n=$("rName").value.trim();
   if(!n||!DRAFT.length){alert("Donnez un nom à la recette et ajoutez au moins un ingrédient.");return}
-  S.recipes.push({id:uid(),name:n,items:DRAFT.slice()});
+  if(EDIT){S.recipes.forEach(function(r){if(r.id===EDIT){r.name=n;r.items=DRAFT.slice()}})}else S.recipes.push({id:uid(),name:n,items:DRAFT.slice()});
+  EDIT=null;$("rSave").textContent="Enregistrer la recette";
   DRAFT=[];$("rName").value="";renderDraft();
   $("recipeForm").hidden=true;$("newRecipeBtn").hidden=false;
   save();render();
@@ -409,6 +493,7 @@ document.addEventListener("click",function(e){
   else if(a==="folderadd"){var inp=t.previousSibling;if(inp)addFood(inp.value,t.dataset.cat)}
   else if(a==="remove"){S.list=S.list.filter(function(i){return i.id!==id});save();render()}
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
+  else if(a==="editreci"){editRecipe(id)}
   else if(a==="usereci"){useRecipe(id)}
   else if(a==="delreci"){S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
   else if(a==="deldraft"){DRAFT.splice(parseInt(id,10),1);renderDraft()}
@@ -437,7 +522,15 @@ $("newRecipeBtn").addEventListener("click",function(){$("recipeForm").hidden=fal
 $("rAddIng").addEventListener("click",addDraft);
 $("rIng").addEventListener("keydown",function(e){if(e.key==="Enter")addDraft()});
 $("rSave").addEventListener("click",saveRecipe);
+$("rCancel").addEventListener("click",closeForm);
 $("finish").addEventListener("click",finish);
+function setStore(on){
+  STORE=on;document.body.classList.toggle("store",on);
+  var b=$("storeBtn");b.setAttribute("aria-pressed",on?"true":"false");b.textContent=on?"Quitter":"Mode magasin";
+  try{if(on){if(navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l}).catch(function(){})}else if(WL){WL.release();WL=null}}catch(err){}
+  renderList();
+}
+$("storeBtn").addEventListener("click",function(){setStore(!STORE)});
 var TABS=["liste","produits","recettes"],cur=0,timer=null;
 function settle(){
   clearTimeout(timer);
@@ -464,7 +557,7 @@ document.addEventListener("touchstart",function(e){
   tx=e.touches[0].clientX;ty=e.touches[0].clientY;
 },{passive:true});
 document.addEventListener("touchend",function(e){
-  if(!tk)return;
+  if(!tk||DR)return;
   var c=e.changedTouches[0],dx=c.clientX-tx,dy=c.clientY-ty;
   if(Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.6)return;
   var n=cur+(dx<0?1:-1);if(n>=0&&n<TABS.length)tab(TABS[n]);
