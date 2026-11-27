@@ -14,7 +14,7 @@ Petite app web minimaliste pour préparer ses listes de courses.
 Ouvrir `index.html` dans un navigateur, ou la publier avec GitHub Pages :
 1. Settings → Pages
 2. Source : *Deploy from a branch*, branche `main`, dossier `/ (root)`
-3. L'app est disponible à `https://<votre-pseudo>.github.io/<nom-du-depot>/`
+3. L'app est disponible à `(https://github.com/UUzer123/Mes-courses/)`
 
 Sur téléphone : ouvrir le lien, puis « Ajouter à l'écran d'accueil ».
 
