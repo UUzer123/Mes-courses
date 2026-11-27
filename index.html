@@ -62,6 +62,124 @@ body.store #dock .addr{display:none}
 .dempty{color:var(--muted);font-size:13px}
 .two{display:flex;gap:8px;margin-top:8px}
 .two>*{flex:1}
+.tview{overflow:hidden;margin-top:8px}
+.ttrack{display:flex;transition:transform .3s ease}
+.sl{flex:0 0 100%;min-width:0;padding:0 2px}
+.ill{height:200px;border:1px solid var(--line);border-radius:16px;background:var(--surface);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tt{font-size:22px;font-weight:800;margin:20px 0 6px}
+.tp{color:var(--muted);min-height:92px}
+.tdots{display:flex;justify-content:center;gap:6px;margin:10px 0 16px}
+.tdots i{width:6px;height:6px;border-radius:50%;background:var(--line);transition:background .2s,width .2s}
+.tdots i.on{background:var(--ink);width:18px;border-radius:3px}
+.mini{width:220px;display:flex;flex-direction:column;gap:10px;position:relative}
+.mr{display:flex;align-items:center;gap:10px}
+.mc{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink);flex:none;display:block}
+.mr b{display:block;height:8px;border-radius:4px;background:var(--line);width:80%}
+.madd{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 14px;font-size:12px;color:var(--muted);margin-top:4px}
+.madd em{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px}
+.mf{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600}
+.chev{width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(-135deg);display:block;margin-top:3px}
+.mbody{overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:0 4px}
+.mk{background:var(--ink)}
+.m2b{width:220px;height:118px;position:relative}
+.m2b .rw{position:absolute;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:13px;font-weight:600;background:var(--surface)}
+.m2b .r1{top:0}.m2b .r2{top:42px;z-index:2}.m2b .r3{top:84px}
+.grip{width:12px;height:9px;border-top:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);position:relative;display:block}
+.grip::after{content:"";position:absolute;left:0;right:0;top:50%;margin-top:-.75px;height:1.5px;background:var(--muted)}
+.mfing{position:absolute;right:40px;top:48px;width:22px;height:22px;border-radius:50%;border:2px solid var(--ink);opacity:0;z-index:3}
+.m3{width:220px;height:92px;position:relative}
+.m3 .mr{position:absolute;left:0;right:0;height:40px}
+.m3 .ra{top:48px}.m3 .rb{top:0}
+.m3 .ra .mc{background:var(--ink)}
+.m3 .mr b{width:60%}
+.strike{position:absolute;left:26px;top:50%;height:1.5px;width:36%;background:var(--ink);transform-origin:left}
+.m4{width:220px;height:60px;position:relative}
+.mrec{position:absolute;left:0;right:0;top:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.mq{color:var(--muted);font-size:13px;margin-right:34px}
+.mdot{position:absolute;right:12px;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;border:2px solid var(--ink);opacity:0}
+.msheet{position:absolute;left:0;right:0;bottom:0;height:96px;background:var(--bg);border-top:1px solid var(--line);border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center}
+.mwheel{display:flex;gap:26px;align-items:center;font-weight:600;color:var(--muted);font-size:18px}
+.mwheel u{text-decoration:none}.mwheel .sel{color:var(--ink);font-size:28px}
+.m5{width:220px;height:150px;position:relative}
+.mday{position:absolute;left:0;right:0;height:32px;border:1px dashed var(--line);border-radius:8px;padding:0 10px;display:flex;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.mday:nth-child(1){top:0}.mday:nth-child(2){top:40px;border:1px solid var(--ink)}.mday:nth-child(3){top:80px}
+.mchip{position:absolute;left:112px;top:44px;font-size:12px;font-weight:600;background:var(--ink);color:var(--bg);border-radius:999px;padding:5px 12px}
+.m6{width:220px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.mblur{position:relative;width:100%;display:flex;flex-direction:column;gap:12px;padding:6px 0}
+.mblur .mr b{filter:blur(4px)}
+.mamt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
+.meur{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:600}
+.m7{width:200px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 12px 8px;position:relative;overflow:hidden}
+.mbar{width:100%;height:64px;background:repeating-linear-gradient(90deg,#111 0 2px,#fff 2px 4px,#111 4px 5px,#fff 5px 8px,#111 8px 11px,#fff 11px 12px,#111 12px 13px,#fff 13px 15px)}
+.mnum{font:12px ui-monospace,Menlo,monospace;letter-spacing:.14em;color:#111}
+.mscan{position:absolute;left:0;right:0;top:12px;height:2px;background:#888;opacity:0}
+.m8{display:flex;flex-direction:column;gap:14px;align-items:center}
+.mtoast{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 18px;font-size:13px}
+.mtoast u{font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.mrow{display:flex;gap:8px}
+.mrow span{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted)}
+@keyframes tDragC{0%,22%{transform:translateY(42px) scale(1);border-color:var(--line);box-shadow:none}30%,55%{border-color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.14)}30%{transform:translateY(42px) scale(1.04)}55%{transform:translateY(0) scale(1.04)}64%,92%{transform:none;border-color:var(--line);box-shadow:none}100%{transform:translateY(42px) scale(1);border-color:var(--line);box-shadow:none}}
+@keyframes tDragB{0%,30%{transform:translateY(-42px)}55%,92%{transform:none}100%{transform:translateY(-42px)}}
+@keyframes tFing{0%{opacity:0;transform:translateY(42px) scale(.6)}8%{opacity:1;transform:translateY(42px) scale(1)}22%{opacity:1;transform:translateY(42px) scale(1.25)}30%{opacity:1;transform:translateY(42px) scale(1)}55%{opacity:1;transform:translateY(0) scale(1)}62%,100%{opacity:0;transform:translateY(0) scale(1)}}
+@keyframes tRise{0%{opacity:0;transform:translateY(8px)}12%,88%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes tOpen{0%,8%{max-height:0;opacity:0}22%,86%{max-height:90px;opacity:1}100%{max-height:0;opacity:0}}
+@keyframes tTurn{0%,8%{transform:rotate(45deg)}22%,86%{transform:rotate(-135deg)}100%{transform:rotate(45deg)}}
+@keyframes tFill{0%,40%{background:transparent}50%,86%{background:var(--ink)}100%{background:transparent}}
+@keyframes tFill2{0%,12%{background:transparent}22%,92%{background:var(--ink)}100%{background:transparent}}
+@keyframes tStrike{0%,15%{transform:scaleX(0)}30%,92%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+@keyframes tMoveA{0%,40%{transform:translateY(-48px)}62%,92%{transform:none}100%{transform:translateY(-48px)}}
+@keyframes tMoveB{0%,40%{transform:translateY(48px)}62%,92%{transform:none}100%{transform:translateY(48px)}}
+@keyframes tPress{0%{opacity:0;transform:scale(.6)}8%{opacity:1;transform:scale(1)}30%{opacity:1;transform:scale(1.35)}38%,100%{opacity:0}}
+@keyframes tUp{0%,34%{transform:translateY(100%)}46%,82%{transform:none}94%,100%{transform:translateY(100%)}}
+@keyframes tQ{0%,80%{opacity:0}86%,96%{opacity:1}100%{opacity:0}}
+@keyframes tDrag{0%,10%{transform:translate(20px,76px);opacity:0}18%{transform:translate(20px,76px);opacity:1}55%,88%{transform:none;opacity:1}100%{transform:none;opacity:0}}
+@keyframes tBlur{0%,20%{filter:blur(0)}40%,88%{filter:blur(5px)}100%{filter:blur(0)}}
+@keyframes tAmt{0%,25%{opacity:0;transform:scale(.92)}42%,88%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes tPulse{0%,12%{transform:scale(1)}18%{transform:scale(.88)}26%,100%{transform:scale(1)}}
+@keyframes tCard{0%{opacity:0;transform:translateY(14px)}12%,92%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes tScan{0%,20%{top:12px;opacity:0}25%{opacity:.8}60%{top:74px;opacity:.8}65%,100%{top:74px;opacity:0}}
+.sl.on .a1{animation:tRise 4.5s ease infinite}
+.sl.on .m2b .r2{animation:tDragC 6s ease infinite}
+.sl.on .m2b .r3{animation:tDragB 6s ease infinite}
+.sl.on .mfing{animation:tFing 6s ease infinite}
+.sl.on .a2{animation:tRise 4.5s ease .3s infinite}
+.sl.on .a3{animation:tRise 4.5s ease .6s infinite}
+.sl.on .a4{animation:tRise 4.5s ease .9s infinite}
+.sl.on .mbody{animation:tOpen 5s ease infinite}
+.sl.on .chev{animation:tTurn 5s ease infinite}
+.sl.on .mk{animation:tFill 5s ease infinite}
+.sl.on .m3 .ra{animation:tMoveA 5s ease infinite}
+.sl.on .m3 .rb{animation:tMoveB 5s ease infinite}
+.sl.on .m3 .ra .mc{animation:tFill2 5s ease infinite}
+.sl.on .strike{animation:tStrike 5s ease infinite}
+.sl.on .mdot{animation:tPress 5.5s ease infinite}
+.sl.on .msheet{animation:tUp 5.5s ease infinite}
+.sl.on .mq{animation:tQ 5.5s ease infinite}
+.sl.on .mchip{animation:tDrag 5s ease infinite}
+.sl.on .mblur .mr{animation:tBlur 5s ease infinite}
+.sl.on .mamt{animation:tAmt 5s ease infinite}
+.sl.on .meur{animation:tPulse 5s ease infinite}
+.sl.on .m7{animation:tCard 5s ease infinite}
+.sl.on .mscan{animation:tScan 5s ease infinite}
+.sl.on .m8 .mtoast{animation:tRise 4.5s ease infinite}
+.sl.on .m8 .mrow{animation:tRise 4.5s ease .5s infinite}
+@media (prefers-reduced-motion:reduce){.ttrack{transition:none}.sl.on *{animation:none!important}}
+.recipe{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.dq{color:var(--muted);font-size:.85em;margin-left:6px}
+#qsheet{position:fixed;inset:0;z-index:40}
+.qs-back{position:absolute;inset:0;background:rgba(0,0,0,.35);animation:fadeIn .2s ease}
+.qs-panel{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--surface);border-radius:18px 18px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:sheetUp .25s ease}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.qs-title{font-weight:800;font-size:20px;text-align:center}
+.qs-sub{color:var(--muted);font-size:13px;text-align:center;margin:2px 0 8px}
+.wheel{position:relative;height:150px;margin:6px 0 14px}
+.wsel{position:absolute;left:28%;right:28%;top:50px;height:50px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);pointer-events:none}
+.wlist{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;padding:50px 0;scrollbar-width:none;overscroll-behavior:contain;-webkit-mask-image:linear-gradient(transparent,#000 35%,#000 65%,transparent);mask-image:linear-gradient(transparent,#000 35%,#000 65%,transparent)}
+.wlist::-webkit-scrollbar{display:none}
+.wlist div{height:50px;line-height:50px;text-align:center;font-size:24px;font-weight:600;scroll-snap-align:center;color:var(--muted);cursor:pointer}
+.wlist div.on{color:var(--ink);font-size:28px}
+@media (prefers-reduced-motion:reduce){.qs-back,.qs-panel{animation:none}}
 .foot #shareBtn{grid-column:1;justify-self:start}
 #toast{position:fixed;left:50%;bottom:calc(190px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 18px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
 #toast.show{animation:toastIn .22s ease}
@@ -220,6 +338,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <button role="menuitem" data-m="prices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 1 0 17 17.5M5 10h8M5 14h8"/></svg>Prix</button>
     <button role="menuitem" data-m="cards"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Carte</button>
     <button role="menuitem" data-m="backup"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M5 20h14"/></svg>Sauvegarde</button>
+    <button role="menuitem" data-m="tuto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg>Tutoriel</button>
   </div>
   <section id="v-liste">
     <h1>Ma liste</h1>
@@ -246,7 +365,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </section>
   <section id="v-recettes" hidden>
     <h1>Mes recettes</h1>
-    <p class="sub">Touchez une recette pour ajouter ses ingrédients à votre liste.</p>
+    <p class="sub">Touchez une recette pour ajouter ses ingrédients à votre liste. Maintenez-la pour choisir la quantité.</p>
     <div id="recipes"></div>
     <button class="ghost" id="newRecipeBtn">+ Nouvelle recette</button>
     <div class="form" id="recipeForm" hidden>
@@ -316,6 +435,65 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </div>
   </div>
 </div>
+<div id="tuto" class="ov" hidden role="dialog" aria-label="Tutoriel">
+  <div class="pin">
+    <div class="phead"><button class="pback" data-close="tuto" aria-label="Fermer">‹</button><h1>Tutoriel</h1></div>
+    <div class="tview"><div class="ttrack" id="ttrack">
+      <div class="sl"><div class="ill"><div class="mini">
+        <div class="mr a1"><i class="mc"></i><b></b></div>
+        <div class="mr a2"><i class="mc"></i><b style="width:55%"></b></div>
+        <div class="mr a3"><i class="mc"></i><b style="width:70%"></b></div>
+        <div class="madd a4"><span>Ajouter un article</span><em>+</em></div>
+      </div></div>
+      <div class="tt">Ma liste</div>
+      <div class="tp">Les articles se rangent par rayon.</div></div>
+
+      <div class="sl"><div class="ill" style="height:128px"><div class="mini">
+        <div class="mf"><span>Frais</span><s class="chev"></s></div>
+        <div class="mbody"><div class="mr"><i class="mc mk"></i><b style="width:50%"></b></div><div class="mr"><i class="mc"></i><b style="width:65%"></b></div></div>
+      </div></div>
+      <div class="ill" style="height:128px;margin-top:10px"><div class="m2b">
+        <div class="rw r1"><span>Frais</span><i class="grip"></i></div>
+        <div class="rw r2"><span>Boissons</span><i class="grip"></i></div>
+        <div class="rw r3"><span>Épicerie</span><i class="grip"></i></div>
+        <i class="mfing"></i>
+      </div></div>
+      <div class="tt" style="margin-top:16px">Produits</div>
+      <div class="tp">Maintenez un rayon pour le déplacer : la liste suit votre parcours dans le magasin.</div></div>
+
+      <div class="sl"><div class="ill"><div class="m5">
+        <div class="mday">Lun</div><div class="mday">Mar</div><div class="mday">Mer</div>
+        <div class="mchip">Pâtes</div>
+      </div></div>
+      <div class="tt">Planning</div>
+      <div class="tp">Organisez vos repas de la semaine d’un coup d’œil.</div></div>
+
+      <div class="sl"><div class="ill"><div class="m6">
+        <div class="mblur"><div class="mr"><b></b></div><div class="mr"><b style="width:60%"></b></div><div class="mr"><b style="width:75%"></b></div><div class="mamt">≈ 23,40 €</div></div>
+        <div class="meur">€</div>
+      </div></div>
+      <div class="tt">Prix</div>
+      <div class="tp">Renseignez vos prix de vos articles habituels dans le menu pour obtenir une estimation du prix de votre liste.</div></div>
+
+      <div class="sl"><div class="ill"><div class="m7">
+        <div class="mbar"></div><div class="mnum">5901 2341 2345 7</div><i class="mscan"></i>
+      </div></div>
+      <div class="tt">Cartes</div>
+      <div class="tp">Gardez toutes vos cartes de fidélité dans l’app.</div></div>
+    </div></div>
+    <div class="tdots" id="tdots"></div>
+    <div class="two"><button class="ghost" id="tPrev" style="margin-top:0">Précédent</button><button class="fin" id="tNext">Suivant</button></div>
+  </div>
+</div>
+<div id="qsheet" hidden role="dialog" aria-label="Quantité de la recette">
+  <div class="qs-back"></div>
+  <div class="qs-panel">
+    <div class="qs-title" id="qsName"></div>
+    <div class="qs-sub">Quantité · les ingrédients sont multipliés</div>
+    <div class="wheel"><div class="wsel"></div><div class="wlist" id="wlist"></div></div>
+    <div class="two"><button class="ghost" id="qsNo" style="margin-top:0">Annuler</button><button class="fin" id="qsOk">Ajouter</button></div>
+  </div>
+</div>
 <div id="toast" hidden role="status" aria-live="polite"></div>
 <div id="cardview" class="ov" hidden role="dialog" aria-label="Carte de fidélité">
   <div id="cvname"></div>
@@ -350,7 +528,8 @@ function load(){try{S=JSON.parse(localStorage.getItem("courses-v1")||"null")}cat
   if(!S.recipes)S.recipes=seedRecipes();
   if(!S.plan||S.plan.length!==7)S.plan=[[],[],[],[],[],[],[]];
   if(!S.dishes)S.dishes=[];
-  if(!S.cards)S.cards=[];}
+  if(!S.cards)S.cards=[];
+  if(!S.dishQty)S.dishQty={};}
 function save(){try{localStorage.setItem("courses-v1",JSON.stringify(S))}catch(e){}}
 function $(id){return document.getElementById(id)}
 function norm(s){return s.trim().toLowerCase()}
@@ -540,25 +719,32 @@ ICONS["Plats"]=ic('<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2.5 5
 function dishDone(r){
   return r.items.length>0&&r.items.every(function(it){var x=S.list.filter(function(i){return norm(i.name)===norm(it.name)})[0];return x&&x.done});
 }
-function addRecipe(r){
-  if(S.dishes.indexOf(r.id)>=0)return false;
-  S.dishes.push(r.id);
+function getQ(id){return (S.dishQty&&S.dishQty[id])||1}
+function addRecipe(r,n){
+  n=n||1;if(!S.dishQty)S.dishQty={};
+  var had=S.dishes.indexOf(r.id)>=0,delta=had?n-getQ(r.id):n;
+  if(had&&!delta)return false;
+  if(!had)S.dishes.push(r.id);
+  S.dishQty[r.id]=n;
   r.items.forEach(function(it){
     if(!findHabit(it.name))S.habits.push({id:uid(),name:it.name,cat:it.cat,count:0});
     var ex=S.list.filter(function(i){return norm(i.name)===norm(it.name)})[0];
-    if(ex){ex.qty=Math.min(99,(ex.qty||1)+1);ex.done=false}
-    else{var h=findHabit(it.name);S.list.push({id:uid(),name:it.name,cat:h.cat,done:false,qty:1})}
+    if(ex){
+      var q=(ex.qty||1)+delta;
+      if(q<1)S.list=S.list.filter(function(i){return i!==ex});
+      else{ex.qty=Math.min(99,q);if(delta>0)ex.done=false}
+    }else if(delta>0){var h=findHabit(it.name);S.list.push({id:uid(),name:it.name,cat:h.cat,done:false,qty:Math.min(99,delta)})}
   });
   return true;
 }
 function removeDish(id){
   snap("Plat retiré");
-  var r=recById(id);
+  var r=recById(id),q=getQ(id);
   S.dishes=S.dishes.filter(function(x){return x!==id});
   if(r)r.items.forEach(function(it){
     var ex=S.list.filter(function(i){return norm(i.name)===norm(it.name)})[0];
     if(!ex)return;
-    if((ex.qty||1)>1)ex.qty--;else S.list=S.list.filter(function(i){return i!==ex});
+    if((ex.qty||1)>q)ex.qty-=q;else S.list=S.list.filter(function(i){return i!==ex});
   });
   save();render();
 }
@@ -570,7 +756,7 @@ function renderDishes(){
   box.appendChild(h);
   ds.forEach(function(r){
     var row=el("div","li"+(dishDone(r)?" done":""));row.dataset.dish=r.id;
-    var nm=el("span","name");nm.style.cursor="default";nm.appendChild(el("span","tx",r.name));
+    var nm=el("span","name");nm.style.cursor="default";nm.appendChild(el("span","tx",r.name));if(getQ(r.id)>1)nm.appendChild(el("span","dq","×"+getQ(r.id)));
     var d=el("button","del","×");d.dataset.act="deldish";d.dataset.id=r.id;d.setAttribute("aria-label","Retirer "+r.name);
     row.appendChild(nm);row.appendChild(d);box.appendChild(row);
   });
@@ -732,7 +918,7 @@ function fixS(){
   if(!S.habits)S.habits=[];if(!S.list)S.list=[];
   if(!S.recipes)S.recipes=seedRecipes();
   if(!S.plan||S.plan.length!==7)S.plan=[[],[],[],[],[],[],[]];
-  if(!S.dishes)S.dishes=[];if(!S.cards)S.cards=[];
+  if(!S.dishes)S.dishes=[];if(!S.cards)S.cards=[];if(!S.dishQty)S.dishQty={};
 }
 function copyText(t){
   if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
@@ -790,6 +976,81 @@ $("bkTextBtn").addEventListener("click",function(){
 });
 $("bkCopy").addEventListener("click",function(){copyText($("bkText").value).then(function(){toast("Texte copié")},function(){toast("Copie impossible : sélectionnez le texte")})});
 $("bkRestore").addEventListener("click",function(){importText($("bkText").value)});
+var QSEL=1,QREC=null,QNOCLICK=false,QP=null,QOPEN=0;
+function markWheel(){[].forEach.call($("wlist").children,function(c){c.classList.toggle("on",+c.dataset.v===QSEL)})}
+function openQty(id){
+  var r=recById(id);if(!r)return;
+  var had=S.dishes.indexOf(id)>=0;
+  QREC=id;QSEL=had?getQ(id):1;QOPEN=Date.now();
+  $("qsName").textContent=r.name;
+  var wl=$("wlist");wl.textContent="";
+  for(var i=1;i<=20;i++){var d=el("div",null,String(i));d.dataset.v=String(i);wl.appendChild(d)}
+  $("qsOk").textContent=had?"Modifier":"Ajouter";
+  $("qsheet").hidden=false;
+  wl.scrollTop=(QSEL-1)*50;markWheel();
+}
+function closeQty(){$("qsheet").hidden=true;QREC=null}
+$("wlist").addEventListener("scroll",function(){
+  var i=Math.max(0,Math.min(19,Math.round(this.scrollTop/50)))+1;
+  if(i!==QSEL){QSEL=i;markWheel();if(navigator.vibrate)navigator.vibrate(4)}
+});
+$("wlist").addEventListener("click",function(e){var d=e.target.closest("[data-v]");if(d)this.scrollTo({top:(+d.dataset.v-1)*50,behavior:"smooth"})});
+$("qsNo").addEventListener("click",closeQty);
+document.querySelector("#qsheet .qs-back").addEventListener("click",function(){if(Date.now()-QOPEN>600)closeQty()});
+$("qsOk").addEventListener("click",function(){
+  var id=QREC,n=QSEL,r=recById(id);closeQty();if(!r)return;
+  var had=S.dishes.indexOf(id)>=0;
+  if(had&&n===getQ(id)){tab("liste");return}
+  snap(had?"Quantité modifiée":"Recette ajoutée");
+  if(addRecipe(r,n)){save();render()}
+  tab("liste");
+});
+function qStart(e){
+  if(e.type==="mousedown"&&e.button!==0)return;
+  var c=e.target.closest&&e.target.closest("#recipes .recipe");
+  if(!c||e.target.closest(".del"))return;
+  var p=pxy(e);
+  QP={x:p.x,y:p.y,t:setTimeout(function(){
+    QP=null;QNOCLICK=true;if(navigator.vibrate)navigator.vibrate(15);
+    openQty(c.dataset.id);setTimeout(function(){QNOCLICK=false},700);
+  },450)};
+}
+function qMove(e){if(!QP)return;var p=pxy(e);if(Math.abs(p.x-QP.x)>10||Math.abs(p.y-QP.y)>10){clearTimeout(QP.t);QP=null}}
+function qEnd(){if(QP){clearTimeout(QP.t);QP=null}}
+document.addEventListener("touchstart",qStart,{passive:true});
+document.addEventListener("mousedown",qStart);
+document.addEventListener("touchmove",qMove,{passive:true});
+document.addEventListener("mousemove",qMove);
+document.addEventListener("touchend",qEnd);
+document.addEventListener("touchcancel",qEnd);
+document.addEventListener("mouseup",qEnd);
+document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#recipes .recipe"))e.preventDefault()});
+var TI=0,TX=0,TY=0;
+function tGo(i){
+  var tr=$("ttrack"),n=tr.children.length;
+  TI=Math.max(0,Math.min(n-1,i));
+  tr.style.transform="translateX(-"+(TI*100)+"%)";
+  [].forEach.call(tr.children,function(sl,k){sl.classList.toggle("on",k===TI)});
+  [].forEach.call($("tdots").children,function(d,k){d.classList.toggle("on",k===TI)});
+  $("tPrev").style.visibility=TI?"visible":"hidden";
+  $("tNext").textContent=TI===n-1?"Terminer":"Suivant";
+}
+function openTuto(){
+  var dots=$("tdots");
+  if(!dots.children.length)for(var k=0;k<$("ttrack").children.length;k++)dots.appendChild(document.createElement("i"));
+  openOvl("tuto");tGo(0);
+}
+$("tNext").addEventListener("click",function(){if(TI>=$("ttrack").children.length-1)$("tuto").hidden=true;else tGo(TI+1)});
+$("tPrev").addEventListener("click",function(){tGo(TI-1)});
+$("tuto").addEventListener("touchstart",function(e){TX=e.touches[0].clientX;TY=e.touches[0].clientY},{passive:true});
+$("tuto").addEventListener("touchend",function(e){
+  var c=e.changedTouches[0],dx=c.clientX-TX,dy=c.clientY-TY;
+  if(Math.abs(dx)>50&&Math.abs(dy)<Math.abs(dx)*.6)tGo(TI+(dx<0?1:-1));
+},{passive:true});
+document.addEventListener("keydown",function(e){
+  if($("tuto").hidden)return;
+  if(e.key==="ArrowRight")tGo(TI+1);else if(e.key==="ArrowLeft")tGo(TI-1);
+});
 function fillSugg(){
   var dl=$("sugg");dl.textContent="";
   S.habits.forEach(function(h){var o=document.createElement("option");o.value=h.name;dl.appendChild(o)});
@@ -810,7 +1071,7 @@ function renderRecipes(){
 }
 function useRecipe(id){
   var r=recById(id);if(!r)return;
-  if(addRecipe(r)){save();render()}
+  if(S.dishes.indexOf(id)<0&&addRecipe(r)){save();render()}
   tab("liste");
 }
 var DRAFT=[];
@@ -884,7 +1145,7 @@ document.addEventListener("click",function(e){
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
   else if(a==="deldish"){removeDish(id)}
   else if(a==="editreci"){editRecipe(id)}
-  else if(a==="usereci"){useRecipe(id)}
+  else if(a==="usereci"){if(!QNOCLICK)useRecipe(id)}
   else if(a==="delreci"){snap("Recette supprimée");S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
   else if(a==="deldraft"){DRAFT.splice(parseInt(id,10),1);renderDraft()}
   else if(a==="delhabit"){S.habits=S.habits.filter(function(h){return h.id!==id});save();render()}
@@ -939,7 +1200,7 @@ function renderPlan(){
 function planAddTo(day,rid){if(S.plan[day].indexOf(rid)<0)S.plan[day].push(rid);save();renderPlan()}
 function planToList(){
   var seen={},n=0;
-  S.plan.forEach(function(ids){ids.forEach(function(id){if(seen[id])return;seen[id]=1;var r=recById(id);if(r){n++;addRecipe(r)}})});
+  S.plan.forEach(function(ids){ids.forEach(function(id){if(seen[id])return;seen[id]=1;var r=recById(id);if(r){n++;if(S.dishes.indexOf(id)<0)addRecipe(r)}})});
   if(!n){alert("Le planning est vide.");return}
   save();render();closePlan();tab("liste");
 }
@@ -949,6 +1210,7 @@ $("menu").addEventListener("click",function(e){
   $("menu").hidden=true;
   if(b.dataset.m==="plan")openPlan();
   else if(b.dataset.m==="prices"){renderPrices();openOvl("prices")}
+  else if(b.dataset.m==="tuto")openTuto();
   else if(b.dataset.m==="backup")openOvl("backup");
   else{renderCards();openOvl("cards")}
 });
@@ -959,7 +1221,7 @@ document.addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape")return;
   $("menu").hidden=true;
-  document.querySelectorAll(".ov").forEach(function(o){o.hidden=true});
+  document.querySelectorAll(".ov").forEach(function(o){o.hidden=true});closeQty();
 });
 $("planBack").addEventListener("click",closePlan);
 $("planAdd").addEventListener("click",planToList);
@@ -1070,7 +1332,7 @@ document.addEventListener("touchstart",function(e){
   tx=e.touches[0].clientX;ty=e.touches[0].clientY;
 },{passive:true});
 document.addEventListener("touchend",function(e){
-  if(!tk||DR||document.querySelector("#plan:not([hidden]),.ov:not([hidden])"))return;
+  if(!tk||DR||document.querySelector("#plan:not([hidden]),.ov:not([hidden]),#qsheet:not([hidden])"))return;
   var c=e.changedTouches[0],dx=c.clientX-tx,dy=c.clientY-ty;
   if(Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.6)return;
   var n=cur+(dx<0?1:-1);if(n>=0&&n<TABS.length)tab(TABS[n]);
