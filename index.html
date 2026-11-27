@@ -62,6 +62,13 @@ body.store #dock .addr{display:none}
 .dempty{color:var(--muted);font-size:13px}
 .two{display:flex;gap:8px;margin-top:8px}
 .two>*{flex:1}
+.foot #shareBtn{grid-column:1;justify-self:start}
+#toast{position:fixed;left:50%;bottom:calc(190px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 18px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+#toast.show{animation:toastIn .22s ease}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translateX(-50%)}}
+#toast button{background:none;border:0;color:inherit;font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+#bkText{width:100%;font:inherit;font-size:12px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+@media (prefers-reduced-motion:reduce){#toast.show{animation:none}}
 .form>select{width:100%}
 #cardview{z-index:30;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;cursor:pointer}
 #cvname{font-size:26px;font-weight:800;letter-spacing:-.01em}
@@ -212,6 +219,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <button role="menuitem" data-m="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Planning</button>
     <button role="menuitem" data-m="prices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 1 0 17 17.5M5 10h8M5 14h8"/></svg>Prix</button>
     <button role="menuitem" data-m="cards"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Carte</button>
+    <button role="menuitem" data-m="backup"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M5 20h14"/></svg>Sauvegarde</button>
   </div>
   <section id="v-liste">
     <h1>Ma liste</h1>
@@ -220,6 +228,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div id="list"></div>
     <div id="lfoot" hidden>
       <div class="foot">
+        <button class="lnk" id="shareBtn">Partager</button>
         <button class="eurbtn" id="priceBtn" aria-label="Aperçu du prix" title="Aperçu du prix">€</button>
         <button class="lnk" id="delList">Supprimer la liste</button>
       </div>
@@ -293,6 +302,21 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </div>
   </div>
 </div>
+<div id="backup" class="ov" hidden role="dialog" aria-label="Sauvegarde">
+  <div class="pin">
+    <div class="phead"><button class="pback" data-close="backup" aria-label="Retour">‹</button><h1>Sauvegarde</h1></div>
+    <p class="sub">Vos données sont enregistrées sur ce téléphone. Exportez-les pour les garder en lieu sûr ou les retrouver sur un autre appareil.</p>
+    <button class="fin" id="bkExport" style="width:100%">Exporter mes données</button>
+    <button class="ghost" id="bkImport">Importer une sauvegarde</button>
+    <input type="file" id="bkFile" accept=".json,application/json" hidden>
+    <button class="lnk" id="bkTextBtn" style="margin-top:20px;padding-left:0">Utiliser du texte à la place</button>
+    <div class="form" id="bkTextBox" hidden>
+      <textarea id="bkText" rows="6" spellcheck="false" aria-label="Données de sauvegarde"></textarea>
+      <div class="two"><button class="ghost" id="bkCopy" style="margin-top:0">Copier</button><button class="ghost" id="bkRestore" style="margin-top:0">Restaurer</button></div>
+    </div>
+  </div>
+</div>
+<div id="toast" hidden role="status" aria-live="polite"></div>
 <div id="cardview" class="ov" hidden role="dialog" aria-label="Carte de fidélité">
   <div id="cvname"></div>
   <div id="cvbar"></div>
@@ -528,6 +552,7 @@ function addRecipe(r){
   return true;
 }
 function removeDish(id){
+  snap("Plat retiré");
   var r=recById(id);
   S.dishes=S.dishes.filter(function(x){return x!==id});
   if(r)r.items.forEach(function(it){
@@ -589,7 +614,7 @@ $("priceBtn").addEventListener("click",showPrice);
 $("pricefx").addEventListener("click",hidePrice);
 $("delList").addEventListener("click",function(){this.hidden=true;$("delConfirm").hidden=false});
 $("delNo").addEventListener("click",function(){$("delConfirm").hidden=true;$("delList").hidden=false});
-$("delYes").addEventListener("click",function(){S.list=[];S.dishes=[];save();render()});
+$("delYes").addEventListener("click",function(){snap("Liste supprimée");S.list=[];S.dishes=[];save();render()});
 var C128=["212222","222122","222221","121223","121322","131222","122213","122312","132212","221213","221312","231212","112232","122132","122231","113222","123122","123221","223211","221132","221231","213212","223112","312131","311222","321122","321221","312212","322112","322211","212123","212321","232121","111323","131123","131321","112313","132113","132311","211313","231113","231311","112133","112331","132131","113123","113321","133121","313121","211331","231131","213113","213311","213131","311123","311321","331121","312113","312311","332111","314111","221411","431111","111224","111422","121124","121421","141122","141221","112214","112412","122114","122411","142112","142211","241211","221114","413111","241112","134111","111242","121142","121241","114212","124112","124211","411212","421112","421211","212141","214121","412121","111143","111341","131141","114113","114311","411113","411311","113141","114131","311141","411131","211412","211214","211232","2331112"];
 var EL=["0001101","0011001","0010011","0111101","0100011","0110001","0101111","0111011","0110111","0001011"];
 var EG=["0100111","0110011","0011011","0100001","0011101","0111001","0000101","0010001","0001001","0010111"];
@@ -684,13 +709,87 @@ $("clist").addEventListener("click",function(e){
   var d=e.target.closest("[data-cdel]");
   if(d){
     var id=d.dataset.cdel;
-    if(cArm===id){clearTimeout(cArmT);cArm=null;S.cards=S.cards.filter(function(x){return x.id!==id});save();renderCards()}
+    if(cArm===id){clearTimeout(cArmT);cArm=null;snap("Carte supprimée");S.cards=S.cards.filter(function(x){return x.id!==id});save();renderCards()}
     else{cArm=id;d.textContent="Supprimer ?";d.style.fontSize="13px";clearTimeout(cArmT);cArmT=setTimeout(function(){cArm=null;renderCards()},3000)}
     return;
   }
   var c=e.target.closest("[data-card]");if(c)showCard(c.dataset.card);
 });
 $("cardview").addEventListener("click",function(){this.hidden=true});
+var TT=null;
+function hideToast(){$("toast").hidden=true}
+function toast(msg,act,fn){
+  var t=$("toast");t.textContent="";t.appendChild(el("span",null,msg));
+  if(act){var b=el("button",null,act);b.type="button";b.addEventListener("click",function(){fn();hideToast()});t.appendChild(b)}
+  t.hidden=false;t.classList.remove("show");void t.offsetWidth;t.classList.add("show");
+  clearTimeout(TT);TT=setTimeout(hideToast,6000);
+}
+function snap(label){
+  var js=JSON.stringify(S);
+  setTimeout(function(){toast(label,"Annuler",function(){S=JSON.parse(js);fixS();save();render();renderCards()})},0);
+}
+function fixS(){
+  if(!S.habits)S.habits=[];if(!S.list)S.list=[];
+  if(!S.recipes)S.recipes=seedRecipes();
+  if(!S.plan||S.plan.length!==7)S.plan=[[],[],[],[],[],[],[]];
+  if(!S.dishes)S.dishes=[];if(!S.cards)S.cards=[];
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
+  return new Promise(function(res,rej){
+    var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();
+    var ok=false;try{ok=document.execCommand("copy")}catch(e){}
+    document.body.removeChild(a);ok?res():rej();
+  });
+}
+function listText(){
+  var out=[],n=0;
+  ORD().forEach(function(c){
+    var its=S.list.filter(function(i){return i.cat===c&&!i.done});if(!its.length)return;
+    out.push(c);
+    its.forEach(function(i){n++;out.push("• "+i.name+((i.qty||1)>1?" ×"+i.qty:""))});
+    out.push("");
+  });
+  return n?"Liste de courses\n\n"+out.join("\n").trim():"";
+}
+function shareList(){
+  var t=listText();
+  if(!t){toast("Rien à partager : la liste est vide");return}
+  function cp(){copyText(t).then(function(){toast("Liste copiée")},function(){toast("Partage impossible ici")})}
+  if(navigator.share){navigator.share({title:"Liste de courses",text:t}).catch(function(e){if(!e||e.name!=="AbortError")cp()})}
+  else cp();
+}
+$("shareBtn").addEventListener("click",shareList);
+function exportJSON(){return JSON.stringify({app:"mes-courses",version:1,exported:new Date().toISOString(),data:S},null,1)}
+function exportData(){
+  try{
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([exportJSON()],{type:"application/json"}));
+    a.download="mes-courses-"+new Date().toISOString().slice(0,10)+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+    toast("Sauvegarde exportée");
+  }catch(e){toast("Export impossible ici : utilisez le texte")}
+}
+function importText(txt){
+  var o;try{o=JSON.parse(txt)}catch(e){toast("Contenu non reconnu");return}
+  var d=o&&o.data?o.data:o;
+  if(!d||!Array.isArray(d.habits)||!Array.isArray(d.list)){toast("Ce n’est pas une sauvegarde de l’app");return}
+  snap("Données restaurées");
+  S=d;fixS();save();render();renderCards();
+}
+$("bkExport").addEventListener("click",exportData);
+$("bkImport").addEventListener("click",function(){$("bkFile").click()});
+$("bkFile").addEventListener("change",function(){
+  var f=this.files&&this.files[0],inp=this;if(!f)return;
+  var r=new FileReader();r.onload=function(){importText(String(r.result));inp.value=""};r.readAsText(f);
+});
+$("bkTextBtn").addEventListener("click",function(){
+  var b=$("bkTextBox");b.hidden=!b.hidden;
+  if(!b.hidden)$("bkText").value=exportJSON();
+});
+$("bkCopy").addEventListener("click",function(){copyText($("bkText").value).then(function(){toast("Texte copié")},function(){toast("Copie impossible : sélectionnez le texte")})});
+$("bkRestore").addEventListener("click",function(){importText($("bkText").value)});
 function fillSugg(){
   var dl=$("sugg");dl.textContent="";
   S.habits.forEach(function(h){var o=document.createElement("option");o.value=h.name;dl.appendChild(o)});
@@ -755,6 +854,7 @@ function render(){renderChips();renderList();renderRecipes();fillSugg()}
 function finish(){
   var done=S.list.filter(function(i){return i.done});
   if(!done.length){alert("Cochez d’abord les articles que vous avez achetés.");return}
+  snap("Courses terminées");
   done.forEach(function(i){
     var h=findHabit(i.name);
     if(h)h.count++;else S.habits.push({id:uid(),name:i.name,cat:i.cat,count:1});
@@ -780,12 +880,12 @@ document.addEventListener("click",function(e){
   }
   else if(a==="showadd"){var rw=t.nextSibling;t.hidden=true;rw.hidden=false;rw.firstChild.focus()}
   else if(a==="folderadd"){var inp=t.previousSibling;if(inp)addFood(inp.value,t.dataset.cat)}
-  else if(a==="remove"){S.list=S.list.filter(function(i){return i.id!==id});save();render()}
+  else if(a==="remove"){snap("Article retiré");S.list=S.list.filter(function(i){return i.id!==id});save();render()}
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
   else if(a==="deldish"){removeDish(id)}
   else if(a==="editreci"){editRecipe(id)}
   else if(a==="usereci"){useRecipe(id)}
-  else if(a==="delreci"){S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
+  else if(a==="delreci"){snap("Recette supprimée");S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
   else if(a==="deldraft"){DRAFT.splice(parseInt(id,10),1);renderDraft()}
   else if(a==="delhabit"){S.habits=S.habits.filter(function(h){return h.id!==id});save();render()}
 });
@@ -849,6 +949,7 @@ $("menu").addEventListener("click",function(e){
   $("menu").hidden=true;
   if(b.dataset.m==="plan")openPlan();
   else if(b.dataset.m==="prices"){renderPrices();openOvl("prices")}
+  else if(b.dataset.m==="backup")openOvl("backup");
   else{renderCards();openOvl("cards")}
 });
 document.addEventListener("click",function(e){
