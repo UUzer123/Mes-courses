@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Courses">
+<title>Mes courses</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#F3F3F3;--surface:#FFFFFF;--ink:#111111;--muted:#777777;--line:#E4E4E4;--accent:#111111;--on-accent:#FFFFFF;--chip:#111111;--chip-ink:#FFFFFF;--done:#A0A0A0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E0E0E;--surface:#171717;--ink:#EDEDED;--muted:#8A8A8A;--line:#272727;--accent:#EDEDED;--on-accent:#111111;--chip:#EDEDED;--chip-ink:#111111;--done:#666666}}
+:root[data-theme="dark"]{--bg:#0E0E0E;--surface:#171717;--ink:#EDEDED;--muted:#8A8A8A;--line:#272727;--accent:#EDEDED;--on-accent:#111111;--chip:#EDEDED;--chip-ink:#111111;--done:#666666;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.4}
+main{max-width:560px;margin:0 auto;padding:20px 16px 96px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:8px 0 2px}
+.sub{color:var(--muted);margin:0 0 18px}
+h2{font-size:15px;font-weight:600;color:var(--muted);margin:22px 0 8px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;padding:14px 8px;background:none;border:0;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+nav button[aria-selected="true"]{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.add{display:flex;gap:8px;flex-wrap:wrap}
+input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+input{flex:1 1 180px}
+select{flex:0 1 auto}
+button.main{font:inherit;font-weight:600;background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;padding:12px 18px;cursor:pointer}
+button.ghost{font:inherit;font-weight:600;background:none;color:var(--accent);border:1px solid var(--accent);border-radius:12px;padding:12px 18px;cursor:pointer;width:100%;margin-top:18px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;background:var(--chip);color:var(--chip-ink);border:0;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600}
+.folder{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden}
+.folder summary{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:15px;font-weight:600;cursor:pointer}
+.folder summary .nm{flex:1}
+.folder summary svg{flex:none;color:var(--muted)}
+.folder summary::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform .15s}
+.folder[open] summary::after{transform:rotate(-135deg);margin-bottom:-3px}
+.folder summary::-webkit-details-marker{display:none}
+.folder summary:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.badge{background:var(--chip);color:var(--chip-ink);border-radius:999px;font-size:12px;padding:1px 8px}
+.folder .body{padding:0 12px 10px;display:flex;flex-direction:column;gap:8px}
+.plus{font:inherit;font-size:15px;font-weight:600;background:none;border:1px dashed var(--line);color:var(--muted);border-radius:8px;padding:8px 10px;cursor:pointer;text-align:left}
+.plus:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt .del{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+.recipe{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.recipe .info{flex:1;min-width:0}
+.rname{font:inherit;font-weight:600;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;text-align:left}
+.rname:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.recipe .ing{color:var(--muted);font-size:14px;margin-top:2px}
+.recipe .del{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.form>input{width:100%}
+.opt{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:16px;border-bottom:1px solid var(--line);cursor:pointer}
+.opt:last-of-type{border-bottom:0}
+.opt input{flex:none;width:24px;height:24px;padding:0;accent-color:var(--accent);cursor:pointer}
+.opt span{flex:1}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.group h3{margin:0;padding:10px 14px;font-size:15px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .name{flex:1;cursor:pointer}
+.row .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--accent);background:none;flex:none;cursor:pointer;color:var(--on-accent);font-size:16px;line-height:1;padding:0}
+.row.done .box{background:var(--accent)}
+.row.done .name{color:var(--done);text-decoration:line-through}
+.row .meta{color:var(--muted);font-size:14px}
+.row .del{background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px}
+.empty{color:var(--muted);padding:18px 4px}
+#splash{position:fixed;inset:0;z-index:50;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;animation:splashOut .5s ease 2.4s forwards}
+#splash svg{width:104px;height:104px;overflow:visible}
+#splash .d{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .7s ease forwards}
+#splash .d1{animation-delay:.15s}
+#splash .d2{animation-delay:.45s}
+#splash .d3{animation-delay:1s;animation-duration:.5s}
+#splash .wm{font-size:22px;font-weight:600;letter-spacing:.14em;opacity:0;animation:wm .6s ease 1.4s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes wm{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){#splash{animation-delay:.8s;animation-duration:.2s}#splash .d{animation:none;stroke-dashoffset:0}#splash .wm{animation:none;opacity:1}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true">
+  <svg viewBox="0 0 96 96">
+    <path class="d d1" pathLength="1" d="M34 40V32a14 14 0 0 1 28 0V40"/>
+    <path class="d d2" pathLength="1" d="M20 40H76L69 74a4 4 0 0 1-4 3H31a4 4 0 0 1-4-3Z"/>
+    <path class="d d3" pathLength="1" d="M38 57L46 65L60 49"/>
+  </svg>
+  <div class="wm">mes courses</div>
+</div>
+<main>
+  <section id="v-liste">
+    <h1>Ma liste</h1>
+    <p class="sub" id="resume"></p>
+    <div class="add">
+      <input id="newItem" placeholder="Ajouter un article" autocomplete="off" enterkeyhint="done">
+      <select id="newCat" aria-label="Rayon"></select>
+      <button class="main" id="addBtn">Ajouter</button>
+    </div>
+    <h2>Rayons</h2>
+    <div id="chips"></div>
+    <h2>À acheter</h2>
+    <div id="list"></div>
+    <button class="ghost" id="finish">Terminer les courses</button>
+  </section>
+  <section id="v-recettes" hidden>
+    <h1>Mes recettes</h1>
+    <p class="sub">Touchez une recette pour ajouter ses ingrédients à votre liste.</p>
+    <div id="recipes"></div>
+    <button class="ghost" id="newRecipeBtn">+ Nouvelle recette</button>
+    <div class="form" id="recipeForm" hidden>
+      <input id="rName" placeholder="Nom de la recette" autocomplete="off">
+      <div class="add">
+        <input id="rIng" placeholder="Ingrédient" autocomplete="off" enterkeyhint="done">
+        <select id="rCat" aria-label="Rayon"></select>
+        <button class="main" id="rAddIng" aria-label="Ajouter l’ingrédient">+</button>
+      </div>
+      <div id="rDraft"></div>
+      <button class="main" id="rSave">Enregistrer la recette</button>
+    </div>
+  </section>
+</main>
+<nav role="tablist">
+  <button role="tab" id="t-liste" aria-selected="true">Liste</button>
+  <button role="tab" id="t-recettes" aria-selected="false">Recettes</button>
+</nav>
+<script>
+var CATS=["Fruits & légumes","Frais","Épicerie","Boissons","Maison","Autre"];
+var S=null;
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function seed(){
+  var h=[["Lait","Frais"],["Œufs","Frais"],["Beurre","Frais"],["Pain","Épicerie"],["Pâtes","Épicerie"],["Riz","Épicerie"],["Bananes","Fruits & légumes"],["Pommes","Fruits & légumes"],["Tomates","Fruits & légumes"],["Eau","Boissons"],["Papier toilette","Maison"]];
+  return {habits:h.map(function(x){return {id:uid(),name:x[0],cat:x[1],count:0}}),list:[]};
+}
+function seedRecipes(){
+  function r(n,it){return {id:uid(),name:n,items:it.map(function(x){return {name:x[0],cat:x[1]}})}}
+  return [
+    r("Pâtes tomate",[["Pâtes","Épicerie"],["Tomates","Fruits & légumes"],["Oignons","Fruits & légumes"],["Parmesan","Frais"]]),
+    r("Omelette",[["Œufs","Frais"],["Beurre","Frais"],["Fromage râpé","Frais"]]),
+    r("Pancakes",[["Farine","Épicerie"],["Lait","Frais"],["Œufs","Frais"],["Sucre","Épicerie"]])
+  ];
+}
+function load(){try{S=JSON.parse(localStorage.getItem("courses-v1")||"null")}catch(e){S=null}
+  if(!S||!S.habits||!S.list)S=seed();
+  if(!S.recipes)S.recipes=seedRecipes();}
+function save(){try{localStorage.setItem("courses-v1",JSON.stringify(S))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function norm(s){return s.trim().toLowerCase()}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function fillCats(sel){CATS.forEach(function(c){var o=el("option",null,c);o.value=c;sel.appendChild(o)})}
+function inList(name){return S.list.some(function(i){return norm(i.name)===norm(name)})}
+function findHabit(name){return S.habits.filter(function(h){return norm(h.name)===norm(name)})[0]}
+
+function addToList(name,cat){
+  name=name.trim();if(!name||inList(name))return;
+  var h=findHabit(name);
+  S.list.push({id:uid(),name:name,cat:h?h.cat:cat,done:false});
+  save();render();
+}
+var OPEN={};
+function ic(p){return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+var ICONS={
+"Fruits & légumes":ic('<path d="M12 7c-2-2-6-1.5-7 2-1 3.5 1 9 4 11 1.5 1 2.2.5 3 .5s1.5.5 3-.5c3-2 5-7.5 4-11-1-3.5-5-4-7-2z"/><path d="M12 7c0-2 1-4 3-5"/>'),
+"Frais":ic('<path d="M8 3h8l1 4v13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V7z"/><path d="M7 7h10"/><path d="M10 13h4"/>'),
+"Épicerie":ic('<path d="M5 8h14l-1.2 11a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
+"Boissons":ic('<path d="M10 2h4v4l2 3v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9l2-3z"/><path d="M8 13h8"/>'),
+"Maison":ic('<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>'),
+"Autre":ic('<circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/>')
+};
+function renderChips(){
+  var box=$("chips");box.textContent="";
+  CATS.forEach(function(c){
+    var items=S.habits.filter(function(h){return h.cat===c}).sort(function(a,b){return b.count-a.count||a.name.localeCompare(b.name)});
+    var n=items.filter(function(h){return inList(h.name)}).length;
+    var d=el("details","folder");
+    if(OPEN[c])d.open=true;
+    d.addEventListener("toggle",function(){OPEN[c]=d.open});
+    var s=el("summary");s.insertAdjacentHTML("afterbegin",ICONS[c]||ICONS["Autre"]);s.appendChild(el("span","nm",c));if(n)s.appendChild(el("span","badge",String(n)));
+    d.appendChild(s);
+    var body=el("div","body");
+    if(!items.length)body.appendChild(el("div","empty","Aucun produit dans ce rayon. Ajoutez-en un ci-dessous."));
+    items.forEach(function(h){
+      var lab=el("label","opt");
+      var cb=el("input");cb.type="checkbox";cb.checked=inList(h.name);cb.dataset.habit=h.id;
+      lab.appendChild(cb);lab.appendChild(el("span",null,h.name));
+      var x=el("button","del","×");x.type="button";x.dataset.act="delhabit";x.dataset.id=h.id;x.setAttribute("aria-label","Supprimer "+h.name);
+      lab.appendChild(x);body.appendChild(lab);
+    });
+    var plus=el("button","plus","+ Ajouter un aliment");plus.dataset.act="showadd";
+    var row=el("div","add");row.hidden=true;
+    var inp=el("input");inp.placeholder="Nom de l’aliment";inp.dataset.cat=c;inp.setAttribute("aria-label","Nouvel aliment : "+c);
+    var btn=el("button","main","Ajouter");btn.dataset.act="folderadd";btn.dataset.cat=c;
+    row.appendChild(inp);row.appendChild(btn);body.appendChild(plus);body.appendChild(row);
+    d.appendChild(body);box.appendChild(d);
+  });
+}
+function renderList(){
+  var box=$("list");box.textContent="";
+  if(!S.list.length){box.appendChild(el("div","empty","Votre liste est vide. Touchez un habituel ci-dessus ou ajoutez un article."));$("resume").textContent="";$("finish").hidden=true;return}
+  $("finish").hidden=false;
+  var done=S.list.filter(function(i){return i.done}).length;
+  $("resume").textContent=done+" sur "+S.list.length+" dans le panier";
+  CATS.forEach(function(c){
+    var items=S.list.filter(function(i){return i.cat===c});if(!items.length)return;
+    var g=el("div","group");g.appendChild(el("h3",null,c));
+    items.forEach(function(i){
+      var r=el("div","row"+(i.done?" done":""));
+      var b=el("button","box",i.done?"✓":"");b.dataset.act="toggle";b.dataset.id=i.id;b.setAttribute("aria-label","Cocher "+i.name);
+      var n=el("span","name",i.name);n.dataset.act="toggle";n.dataset.id=i.id;
+      var d=el("button","del","×");d.dataset.act="remove";d.dataset.id=i.id;d.setAttribute("aria-label","Retirer "+i.name);
+      r.appendChild(b);r.appendChild(n);r.appendChild(d);g.appendChild(r);
+    });
+    box.appendChild(g);
+  });
+}
+function renderRecipes(){
+  var box=$("recipes");box.textContent="";
+  if(!S.recipes.length){box.appendChild(el("div","empty","Aucune recette. Créez-en une ci-dessous."));return}
+  S.recipes.forEach(function(r){
+    var c=el("div","recipe");c.dataset.act="usereci";c.dataset.id=r.id;
+    var info=el("div","info");
+    var n=el("button","rname",r.name);n.dataset.act="usereci";n.dataset.id=r.id;
+    info.appendChild(n);
+    info.appendChild(el("div","ing",r.items.map(function(i){return i.name}).join(", ")));
+    var d=el("button","del","×");d.dataset.act="delreci";d.dataset.id=r.id;d.setAttribute("aria-label","Supprimer "+r.name);
+    c.appendChild(info);c.appendChild(d);box.appendChild(c);
+  });
+}
+function useRecipe(id){
+  var r=S.recipes.filter(function(x){return x.id===id})[0];if(!r)return;
+  r.items.forEach(function(it){
+    if(!findHabit(it.name))S.habits.push({id:uid(),name:it.name,cat:it.cat,count:0});
+    if(!inList(it.name)){var h=findHabit(it.name);S.list.push({id:uid(),name:it.name,cat:h.cat,done:false})}
+  });
+  save();render();tab("liste");
+}
+var DRAFT=[];
+function renderDraft(){
+  var b=$("rDraft");b.textContent="";b.className=DRAFT.length?"group":"";
+  DRAFT.forEach(function(x,i){
+    var r=el("div","row");r.appendChild(el("span","name",x.name));r.appendChild(el("span","meta",x.cat));
+    var d=el("button","del","×");d.dataset.act="deldraft";d.dataset.id=String(i);d.setAttribute("aria-label","Retirer "+x.name);
+    r.appendChild(d);b.appendChild(r);
+  });
+}
+function addDraft(){
+  var v=$("rIng").value.trim();if(!v)return;
+  var h=findHabit(v);
+  DRAFT.push({name:v,cat:h?h.cat:$("rCat").value});
+  $("rIng").value="";renderDraft();$("rIng").focus();
+}
+function saveRecipe(){
+  var n=$("rName").value.trim();
+  if(!n||!DRAFT.length){alert("Donnez un nom à la recette et ajoutez au moins un ingrédient.");return}
+  S.recipes.push({id:uid(),name:n,items:DRAFT.slice()});
+  DRAFT=[];$("rName").value="";renderDraft();
+  $("recipeForm").hidden=true;$("newRecipeBtn").hidden=false;
+  save();render();
+}
+function render(){renderChips();renderList();renderRecipes()}
+
+function finish(){
+  var done=S.list.filter(function(i){return i.done});
+  if(!done.length){alert("Cochez d’abord les articles que vous avez achetés.");return}
+  done.forEach(function(i){
+    var h=findHabit(i.name);
+    if(h)h.count++;else S.habits.push({id:uid(),name:i.name,cat:i.cat,count:1});
+  });
+  S.list=S.list.filter(function(i){return !i.done});
+  save();render();
+}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-act]");if(!t)return;
+  var id=t.dataset.id,a=t.dataset.act;
+  if(a==="chip"){var h=S.habits.filter(function(x){return x.id===id})[0];if(h)addToList(h.name,h.cat)}
+  else if(a==="toggle"){S.list.forEach(function(i){if(i.id===id)i.done=!i.done});save();render()}
+  else if(a==="showadd"){var rw=t.nextSibling;t.hidden=true;rw.hidden=false;rw.firstChild.focus()}
+  else if(a==="folderadd"){var inp=t.previousSibling;if(inp)addFood(inp.value,t.dataset.cat)}
+  else if(a==="remove"){S.list=S.list.filter(function(i){return i.id!==id});save();render()}
+  else if(a==="usereci"){useRecipe(id)}
+  else if(a==="delreci"){S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
+  else if(a==="deldraft"){DRAFT.splice(parseInt(id,10),1);renderDraft()}
+  else if(a==="delhabit"){S.habits=S.habits.filter(function(h){return h.id!==id});save();render()}
+});
+document.addEventListener("change",function(e){
+  var t=e.target;if(!t.dataset||!t.dataset.habit)return;
+  var h=S.habits.filter(function(x){return x.id===t.dataset.habit})[0];if(!h)return;
+  OPEN[h.cat]=true;
+  if(t.checked)addToList(h.name,h.cat);
+  else{S.list=S.list.filter(function(i){return norm(i.name)!==norm(h.name)});save();render()}
+});
+document.addEventListener("keydown",function(e){
+  var t=e.target;if(e.key!=="Enter"||!t.dataset||!t.dataset.cat||t.tagName!=="INPUT"||!t.value.trim())return;
+  addFood(t.value,t.dataset.cat);
+});
+function addFood(name,cat){
+  name=name.trim();if(!name)return;
+  if(!findHabit(name))S.habits.push({id:uid(),name:name,cat:cat,count:0});
+  OPEN[cat]=true;addToList(name,cat);
+}
+function submitItem(){var v=$("newItem").value;addToList(v,$("newCat").value);$("newItem").value="";$("newItem").focus()}
+$("addBtn").addEventListener("click",submitItem);
+$("newItem").addEventListener("keydown",function(e){if(e.key==="Enter")submitItem()});
+$("newRecipeBtn").addEventListener("click",function(){$("recipeForm").hidden=false;$("newRecipeBtn").hidden=true;$("rName").focus()});
+$("rAddIng").addEventListener("click",addDraft);
+$("rIng").addEventListener("keydown",function(e){if(e.key==="Enter")addDraft()});
+$("rSave").addEventListener("click",saveRecipe);
+$("finish").addEventListener("click",finish);
+function tab(which){
+  $("v-liste").hidden=which!=="liste";$("v-recettes").hidden=which!=="recettes";
+  $("t-liste").setAttribute("aria-selected",which==="liste");$("t-recettes").setAttribute("aria-selected",which==="recettes");
+  window.scrollTo(0,0);
+}
+$("t-liste").addEventListener("click",function(){tab("liste")});
+$("t-recettes").addEventListener("click",function(){tab("recettes")});
+fillCats($("newCat"));fillCats($("rCat"));
+load();render();
+var sp=$("splash");
+function hideSplash(){if(sp&&sp.parentNode){sp.parentNode.removeChild(sp);sp=null}}
+sp.addEventListener("animationend",function(e){if(e.animationName==="splashOut")hideSplash()});
+sp.addEventListener("click",hideSplash);
+setTimeout(hideSplash,4000);
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
