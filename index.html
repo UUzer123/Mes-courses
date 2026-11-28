@@ -219,6 +219,26 @@ body.store #dock .addr{display:none}
 #sMsg{color:var(--muted);font-size:14px;margin:4px 0 12px;min-height:20px}
 #sRes{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:8px}
 #sRes[hidden]{display:none}
+#sBrief{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
+#sBrief[hidden]{display:none}
+.fsc{display:flex;gap:10px;margin:12px 0}
+.fsc>div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.fsc small{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+.fsc .pill{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-weight:800;font-size:18px;color:#fff;background:var(--line)}
+.fsc em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:6px}
+.fhead{display:flex;gap:14px;align-items:center;margin-bottom:4px}
+.fhead img{width:72px;height:72px;object-fit:contain;border-radius:10px;background:#fff;flex:none}
+.fhead h2{margin:0;font-size:20px;color:var(--ink)}
+.fhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.fsec{margin-top:16px}
+.fsec h3{margin:0 0 6px;font-size:14px;color:var(--muted);font-weight:600}
+.fsec p{margin:0;font-size:14px;line-height:1.45}
+.ftab{width:100%;border-collapse:collapse;font-size:14px}
+.ftab td{padding:6px 0;border-top:1px solid var(--line)}
+.ftab td:last-child{text-align:right;color:var(--muted)}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchips span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px}
+.flink{display:block;margin-top:20px;text-align:center;color:var(--muted);font-size:14px}
 #sRes>*{flex:none}
 #sRes input{flex:none}
 #sRes .two{display:flex;gap:8px}#sRes .two>*{flex:1}
@@ -573,11 +593,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div id="sMsg"></div>
     <div id="sRes" hidden>
       <input id="sName" placeholder="Nom du produit" autocomplete="off" maxlength="60">
+      <div id="sBrief" hidden><span id="sBriefTx"></span><button class="lnk" id="sFiche" type="button">Voir la fiche</button></div>
       <select id="sCat" aria-label="Rayon"></select>
       <input id="sPrice" inputmode="decimal" placeholder="Prix en € (facultatif)" autocomplete="off">
       <div class="two"><button class="ghost" id="sSkip" style="margin-top:0">Ignorer</button><button class="main" id="sAdd">Ajouter</button></div>
     </div>
     <div class="scode"><input id="sCode" inputmode="numeric" placeholder="Ou saisir le code-barres" autocomplete="off"><button class="main" id="sGo">OK</button></div>
+  </div>
+</div>
+<div id="fiche" class="ov" hidden role="dialog" aria-label="Fiche produit">
+  <div class="pin">
+    <div class="phead"><button class="pback" data-close="fiche" aria-label="Retour">‹</button><h1>Fiche produit</h1></div>
+    <div id="ficheBody"></div>
   </div>
 </div>
 <div id="qsheet" hidden role="dialog" aria-label="Quantité de la recette">
@@ -596,6 +623,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="qs-sub">Prix, notes et rayon</div>
     <label class="csl"><span>Prix</span><input id="csPrice" class="csnote" inputmode="decimal" placeholder="Prix (€)" autocomplete="off" enterkeyhint="done"></label>
     <label class="csl"><span>Notes</span><input id="csNote" class="csnote" placeholder="Notes (2 kg, bio…)" maxlength="60" autocomplete="off" enterkeyhint="done"></label>
+    <button class="ghost" id="csFiche" type="button" style="margin:0 0 10px" hidden>Fiche produit</button>
     <div id="catlist"></div>
   </div>
 </div>
@@ -1141,7 +1169,7 @@ document.addEventListener("touchcancel",qEnd);
 document.addEventListener("mouseup",qEnd);
 document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#recipes .rcp"))e.preventDefault()});
 document.addEventListener("click",function(e){if(QNOCLICK&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
-var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false;
+var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false,CFICHE=null;
 function openCat(name){
   CNAME=name;COPEN=Date.now();CHOLD=true;
   var h=findHabit(name),li=S.list.filter(function(i){return norm(i.name)===norm(name)})[0];
@@ -1149,6 +1177,7 @@ function openCat(name){
   $("csName").textContent=name;
   $("csNote").value=(li&&li.note)||(h&&h.note)||"";
   $("csPrice").value=h&&h.price>0?String(h.price).replace(".",","):"";
+  CFICHE=h&&h.code&&S.codes[h.code]&&S.codes[h.code].info?h.code:null;$("csFiche").hidden=!CFICHE;
   var box=$("catlist");box.textContent="";
   CATS.forEach(function(c){
     var b=el("button","copt");b.type="button";b.dataset.cat=c;
@@ -1169,6 +1198,7 @@ function saveNote(){
   if(ch)save();return ch;
 }
 function closeCat(){var ch=saveNote();$("csheet").hidden=true;CNAME=null;if(ch)render()}
+$("csFiche").addEventListener("click",function(){if(Date.now()-COPEN<400)return;var c=CFICHE;closeCat();if(c)openFiche(c)});
 $("csNote").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();closeCat()}});
 $("csPrice").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();closeCat()}});
 function setCat(name,cat){
@@ -1442,10 +1472,60 @@ function openScan(mode){
     sMsg("Placez le code-barres dans le cadre.");scanLoop();
   }).catch(function(){$("sVidBox").hidden=true;sMsg("Caméra inaccessible : autorisez-la ou saisissez le code-barres ci-dessous.")});
 }
+
+var NS_COL={a:"#1f8a4c",b:"#6cb33f",c:"#e0a800",d:"#e8821f",e:"#d9432f"},NOVA_COL={1:"#1f8a4c",2:"#6cb33f",3:"#e8821f",4:"#d9432f"};
+var NOVA_TX={1:"Non transformé",2:"Ingrédient culinaire",3:"Transformé",4:"Ultra-transformé"};
+var ALLERG={"milk":"lait","gluten":"gluten","eggs":"œufs","nuts":"fruits à coque","peanuts":"arachides","soybeans":"soja","fish":"poisson","crustaceans":"crustacés","celery":"céleri","mustard":"moutarde","sesame-seeds":"sésame","sulphur-dioxide-and-sulphites":"sulfites","lupin":"lupin","molluscs":"mollusques"};
+function offInfo(pr){
+  if(!pr)return null;
+  var g=function(x){x=String(x||"").toLowerCase();return /^[a-e]$/.test(x)?x:""};
+  var n=pr.nutriments||{},nut={};
+  [["kcal","energy-kcal_100g"],["fat","fat_100g"],["sat","saturated-fat_100g"],["sugars","sugars_100g"],["salt","salt_100g"],["prot","proteins_100g"]].forEach(function(k){var v=n[k[1]];if(typeof v==="number")nut[k[0]]=Math.round(v*10)/10});
+  var o={ns:g(pr.nutriscore_grade),eco:g(pr.ecoscore_grade),nova:pr.nova_group>=1&&pr.nova_group<=4?pr.nova_group:0,
+    brand:String(pr.brands||"").split(",")[0].trim(),qty:String(pr.quantity||"").trim(),
+    ing:String(pr.ingredients_text_fr||pr.ingredients_text||"").trim().slice(0,900),
+    add:(pr.additives_tags||[]).map(function(t){return t.replace(/^\w\w:/,"").toUpperCase()}).slice(0,20),
+    all:(pr.allergens_tags||[]).map(function(t){var k=t.replace(/^\w\w:/,"");return ALLERG[k]||k}).slice(0,12),
+    nut:nut,img:String(pr.image_front_small_url||"")};
+  var has=o.ns||o.eco||o.nova||o.ing||Object.keys(nut).length;
+  return has?o:null;
+}
+function pillHTML(label,val,col,txt){
+  var d=el("div");d.appendChild(el("small",null,label));
+  var p=el("span","pill",val?String(val).toUpperCase():"–");if(val)p.style.background=col;d.appendChild(p);
+  if(txt)d.appendChild(el("em",null,txt));return d;
+}
+function openFiche(code,cc){
+  var c=cc||(S.codes&&S.codes[code]),o=c&&c.info;if(!o)return;
+  var b=$("ficheBody");b.textContent="";
+  var h=el("div","fhead");
+  if(o.img){var im=el("img");im.src=o.img;im.alt="";im.referrerPolicy="no-referrer";im.onerror=function(){im.remove()};h.appendChild(im)}
+  var t=el("div");t.appendChild(el("h2",null,c.name||"Produit"));
+  var sub=[o.brand,o.qty].filter(Boolean).join(" · ");if(sub)t.appendChild(el("p",null,sub));
+  h.appendChild(t);b.appendChild(h);
+  var sc=el("div","fsc");
+  sc.appendChild(pillHTML("Nutri-Score",o.ns,NS_COL[o.ns]));
+  sc.appendChild(pillHTML("NOVA",o.nova||"",NOVA_COL[o.nova],o.nova?NOVA_TX[o.nova]:""));
+  sc.appendChild(pillHTML("Eco-Score",o.eco,NS_COL[o.eco]));
+  b.appendChild(sc);
+  function sec(title,node){var d=el("div","fsec");d.appendChild(el("h3",null,title));d.appendChild(node);b.appendChild(d)}
+  if(o.all&&o.all.length){var ch=el("div","fchips");o.all.forEach(function(a){ch.appendChild(el("span",null,a))});sec("Allergènes",ch)}
+  if(o.add&&o.add.length){var ch2=el("div","fchips");o.add.forEach(function(a){ch2.appendChild(el("span",null,a))});sec("Additifs",ch2)}
+  if(o.ing)sec("Ingrédients",el("p",null,o.ing));
+  var nk2=[["kcal","Énergie","kcal"],["fat","Matières grasses","g"],["sat","dont saturées","g"],["sugars","Sucres","g"],["salt","Sel","g"],["prot","Protéines","g"]].filter(function(r){return o.nut&&o.nut[r[0]]!=null});
+  if(nk2.length){var tb=el("table","ftab");nk2.forEach(function(r){var tr=el("tr");tr.appendChild(el("td",null,r[1]));tr.appendChild(el("td",null,String(o.nut[r[0]]).replace(".",",")+" "+r[2]));tb.appendChild(tr)});sec("Pour 100 g",tb)}
+  var a=el("a","flink","Voir sur Open Food Facts");a.href="https://world.openfoodfacts.org/product/"+encodeURIComponent(code);a.target="_blank";a.rel="noopener";b.appendChild(a);
+  b.appendChild(el("p","flink","Notes issues d’Open Food Facts, base collaborative : elles peuvent différer d’autres applications."));
+  openOvl("fiche");
+}
 function scanShow(code,info,msg){
   SC.busy=true;SC.code=code;
   $("sName").value=info.name||"";$("sCat").value=info.cat||"Autre";
   var eh=info.name?findHabit(info.name):null,pv=info.price||(eh&&eh.price)||"";$("sPrice").value=pv?String(pv).replace(".",","):"";
+  SC.info=info.info||null;
+  var bf=SC.info,tx=[];
+  if(bf){if(bf.ns)tx.push("Nutri-Score "+bf.ns.toUpperCase());if(bf.nova)tx.push("NOVA "+bf.nova);if(bf.eco)tx.push("Eco-Score "+bf.eco.toUpperCase())}
+  $("sBrief").hidden=!bf;$("sBriefTx").textContent=tx.join(" · ")||"Fiche disponible";
   $("sRes").hidden=false;sMsg(msg||"");
   if(!info.name)$("sName").focus();
 }
@@ -1456,25 +1536,26 @@ function scanFound(code){
   if(known){scanShow(code,known,"Produit déjà reconnu.");return}
   sMsg("Recherche du produit…");
   var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){if(ctl)ctl.abort()},6000);
-  fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields=product_name,product_name_fr,categories_tags",ctl?{signal:ctl.signal}:{})
+  fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields=product_name,product_name_fr,brands,quantity,categories_tags,nutriscore_grade,nova_group,ecoscore_grade,ingredients_text,ingredients_text_fr,additives_tags,allergens_tags,nutriments,image_front_small_url",ctl?{signal:ctl.signal}:{})
   .then(function(r){return r.json()}).then(function(d){
     clearTimeout(to);
     var pr=d&&d.status===1&&d.product;
     var nm=pr?String(pr.product_name_fr||pr.product_name||"").trim():"";
-    if(nm)scanShow(code,{name:nm.slice(0,60),cat:guessCat(pr.categories_tags)},"Vérifiez le nom et le rayon.");
+    if(nm)scanShow(code,{name:nm.slice(0,60),cat:guessCat(pr.categories_tags),info:offInfo(pr)},"Vérifiez le nom et le rayon.");
     else scanShow(code,{name:"",cat:"Autre"},"Produit introuvable : donnez-lui un nom.");
   }).catch(function(){clearTimeout(to);scanShow(code,{name:"",cat:"Autre"},"Recherche impossible (connexion ?) : donnez un nom au produit.")});
 }
-function scanResume(){SC.busy=false;SC.code=null;$("sRes").hidden=true;$("sCode").value="";$("sPrice").value="";sMsg(SC.stream?"Placez le code-barres dans le cadre.":"");if(SC.stream)scanLoop()}
+function scanResume(){SC.busy=false;SC.code=null;SC.info=null;$("sRes").hidden=true;$("sCode").value="";$("sPrice").value="";sMsg(SC.stream?"Placez le code-barres dans le cadre.":"");if(SC.stream)scanLoop()}
 $("scanBtn").addEventListener("click",function(){openScan("products")});
 $("rScan").addEventListener("click",function(){openScan("recipe")});
 $("scanBack").addEventListener("click",closeScan);
 $("sSkip").addEventListener("click",scanResume);
+$("sFiche").addEventListener("click",function(){if(!SC.code||!SC.info)return;openFiche(SC.code,{name:$("sName").value.trim()||"Produit",info:SC.info})});
 $("sAdd").addEventListener("click",function(){
   var n=$("sName").value.trim(),c=$("sCat").value;
   if(!n){$("sName").focus();return}
   var pr=parsePrice($("sPrice").value);
-  if(SC.code){S.codes[SC.code]={name:n,cat:c};if(pr)S.codes[SC.code].price=pr}
+  if(SC.code){S.codes[SC.code]={name:n,cat:c};if(pr)S.codes[SC.code].price=pr;if(SC.info)S.codes[SC.code].info=SC.info}
   var ex=findHabit(n);
   if(pr){if(!ex&&SC.mode==="recipe"){ex={id:uid(),name:n,cat:c,count:0};S.habits.push(ex)}if(ex)ex.price=pr}
   if(SC.mode==="recipe"){
@@ -1484,6 +1565,7 @@ $("sAdd").addEventListener("click",function(){
   }
   else if(ex){save();toast("« "+ex.name+" » est déjà dans vos produits")}
   else{S.habits.push({id:uid(),name:n,cat:c,count:0});OPEN[c]=true;save();render();toast("Ajouté : "+n+" · "+c)}
+  if(SC.code){var hh2=findHabit(n);if(hh2){hh2.code=SC.code;save()}}
   scanResume();
 });
 $("sGo").addEventListener("click",function(){var v=$("sCode").value.replace(/\D/g,"");if(v.length<6){sMsg("Code trop court.");return}SC.busy=false;scanFound(v)});
