@@ -418,7 +418,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <input id="newItem" placeholder="Ajouter un article" list="sugg" autocomplete="off" enterkeyhint="done">
     <button class="main plus2" id="addBtn" aria-label="Ajouter">+</button>
   </div>
-  <button class="fin" id="finish" hidden>Terminer les courses</button>
 </div></div>
 <datalist id="sugg"></datalist>
 <div id="plan" class="ov" hidden role="dialog" aria-label="Planning de la semaine">
@@ -708,7 +707,7 @@ function renderList(){
   var total=S.list.length,done=S.list.filter(function(i){return i.done}).length,left=total-done;
   $("barfill").style.width=(total?Math.round(done/total*100):0)+"%";
   $("resume").textContent=total?done+" sur "+total+" dans le panier":"";
-  $("finish").hidden=!done;$("finish").textContent="Terminer les courses ("+done+")";
+  
   var tc=$("tabcount");tc.textContent=left;tc.hidden=!left;
   $("lfoot").hidden=!total;if(!total){$("delConfirm").hidden=true;$("delList").hidden=false}
   renderDishes();
@@ -1363,7 +1362,6 @@ document.addEventListener("touchend",pEnd,{passive:false});
 document.addEventListener("touchcancel",pEnd);
 document.addEventListener("mouseup",pEnd);
 document.addEventListener("contextmenu",function(e){if(PG||PP||(e.target.closest&&e.target.closest(".rchip")))e.preventDefault()});
-$("finish").addEventListener("click",finish);
 function setStore(on){
   STORE=on;document.body.classList.toggle("store",on);
   var b=$("storeBtn");b.setAttribute("aria-pressed",on?"true":"false");b.textContent=on?"Quitter":"Mode magasin";
