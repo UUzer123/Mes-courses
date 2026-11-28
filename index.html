@@ -44,7 +44,7 @@ body.store #dock .addr{display:none}
 .ov{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);animation:planIn .25s ease}
 @keyframes planIn{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
 #rNote{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;resize:vertical;min-height:96px}
-.rnote{white-space:pre-wrap;font-size:14px;color:var(--muted);margin:8px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
+.rnote{white-space:pre-wrap;font-size:15px;color:var(--muted);margin:8px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
 #rpage .form>*{flex:none}
 #rpage .form>input,#rpage .add input{height:46px}
 #rpage .add input{flex:1 1 120px;min-width:0}
@@ -85,20 +85,22 @@ body.store #dock .addr{display:none}
 #pfxMiss ul{list-style:none;margin:8px 0 0;padding:0;max-height:28vh;overflow-y:auto;font-size:14px;color:var(--ink)}
 #pfxMiss li{padding:3px 0}
 .rcp{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.rcp summary{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer}
+.rcp summary{list-style:none;display:flex;align-items:center;gap:12px;padding:15px 14px;cursor:pointer}
 .rcp summary::-webkit-details-marker{display:none}
 .rcp summary::after{content:"";flex:none;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform .25s ease,margin .25s ease}
 .rcp[open] summary::after{transform:rotate(-135deg);margin-bottom:-3px}
+.rcp.closing summary::after{transform:rotate(45deg);margin-bottom:3px}
 .rcp summary:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
 .rn{flex:1;min-width:0;display:flex;flex-direction:column}
-.rt{font-weight:600;font-size:15px}
-.rn small{color:var(--muted);font-size:12px}
-.radd{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer;padding:0}
+.rt{font-weight:600;font-size:18px}
+.rn small{color:var(--muted);font-size:14px;margin-top:2px}
+.radd{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:22px;line-height:1;cursor:pointer;padding:0}
 .radd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.rbody{padding:0 12px 10px}
+.rbody{padding:0 14px 12px}
 .rbody ul{list-style:none;margin:0;padding:0}
-.rbody li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:14px;border-top:1px solid var(--line)}
-.rbody li em{font-style:normal;color:var(--muted);font-size:12px}
+.rbody li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:flex;justify-content:space-between;gap:10px;padding:9px 0;font-size:16px;border-top:1px solid var(--line)}
+.rlink{display:block;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line);color:var(--ink);font-size:15px;text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+#rLink{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;flex:none}
 .ract{display:flex;justify-content:space-between;margin-top:6px}
 .ract .lnk{padding-left:0;padding-right:0}
 @media (prefers-reduced-motion:reduce){.rcp summary::after,#pfxMiss summary::after{transition:none}}
@@ -207,14 +209,13 @@ body.store #dock .addr{display:none}
 .recipe{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .dq{color:var(--muted);font-size:.85em;margin-left:6px}
 #qpback{position:fixed;inset:0;z-index:39}
-#qpop{position:fixed;z-index:41;width:116px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeIn .15s ease}
+#qpop{position:fixed;z-index:41;width:116px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 8px;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeIn .15s ease}
 #qpop[hidden],#qpback[hidden]{display:none}
 .qpw{position:relative;height:108px}
 .qpw .wsel{top:36px;height:36px;left:6%;right:6%}
 .qpw .wlist{padding:36px 0}
 .qpw .wlist div{height:36px;line-height:36px;font-size:18px}
 .qpw .wlist div.on{font-size:20px}
-#qpOk{width:100%;padding:8px 0;border-radius:10px;font-size:14px}
 #qsheet,#csheet{position:fixed;inset:0;z-index:40}
 #csheet .qs-panel{max-height:92vh;overflow-y:auto}
 .csl select{display:block;font-weight:400;font-size:16px;color:var(--ink);height:46px}
@@ -473,7 +474,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </section>
   <section id="v-recettes" hidden>
     <h1>Mes recettes</h1>
-    <p class="sub">Touchez + pour choisir la quantité et ajouter la recette à votre liste. Maintenez une recette pour la déplacer, ou un ingrédient pour ouvrir sa fiche (note, prix, rayon).</p>
+    <p class="sub">Touchez + puis une quantité pour ajouter la recette à votre liste. Maintenez une recette pour la déplacer, ou un ingrédient pour ouvrir sa fiche (note, prix, rayon).</p>
     <div id="recipes"></div>
     <button class="ghost" id="newRecipeBtn">+ Nouvelle recette</button>
   </section>
@@ -595,6 +596,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
       <div id="rSug"></div>
       <div id="rDraft"></div>
+      <input id="rLink" type="url" inputmode="url" autocapitalize="off" placeholder="Lien vers la recette (facultatif)" maxlength="500" aria-label="Lien vers la recette">
       <textarea id="rNote" placeholder="Notes : préparation, cuisson… (facultatif)" rows="4" maxlength="1500"></textarea>
       <div class="rfoot"><button class="main" id="rSave">Enregistrer la recette</button></div>
     </div>
@@ -624,7 +626,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <div id="qpback" hidden></div>
 <div id="qpop" hidden role="dialog" aria-label="Quantité">
   <div class="qpw"><div class="wsel"></div><div class="wlist" id="qplist"></div></div>
-  <button class="main" id="qpOk" type="button">OK</button>
 </div>
 <div id="qsheet" hidden role="dialog" aria-label="Quantité de la recette">
   <div class="qs-back"></div>
@@ -1178,11 +1179,10 @@ function openQtyPop(id,btn){
   QPREC=id;QPSEL=had?getQ(id):1;
   var wl=$("qplist");wl.textContent="";
   for(var i=1;i<=20;i++){var d=el("div",null,String(i));d.dataset.v=String(i);wl.appendChild(d)}
-  $("qpOk").textContent=had?"Modifier":"Ajouter";
   var pop=$("qpop");$("qpback").hidden=false;pop.hidden=false;
   var rc=btn.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight;
-  var left=Math.max(8,Math.min(window.innerWidth-w-8,rc.right-w)),top=rc.bottom+6;
-  if(top+h>window.innerHeight-8)top=Math.max(8,rc.top-h-6);
+  var left=Math.max(8,Math.min(window.innerWidth-w-8,rc.left-w-6)),top=rc.top+rc.height/2-h/2;
+  top=Math.max(8,Math.min(window.innerHeight-h-8,top));
   pop.style.left=left+"px";pop.style.top=top+"px";
   wl.scrollTop=(QPSEL-1)*36;markQP();
 }
@@ -1192,15 +1192,46 @@ $("qplist").addEventListener("scroll",function(){
   var i=Math.max(0,Math.min(19,Math.round(this.scrollTop/36)))+1;
   if(i!==QPSEL){QPSEL=i;markQP();if(navigator.vibrate)navigator.vibrate(4)}
 });
-$("qplist").addEventListener("click",function(e){var d=e.target.closest("[data-v]");if(d)this.scrollTo({top:(+d.dataset.v-1)*36,behavior:"smooth"})});
+$("qplist").addEventListener("click",function(e){var d=e.target.closest("[data-v]");if(d)qpValidate(+d.dataset.v)});
 $("qpback").addEventListener("click",closeQP);
-$("qpOk").addEventListener("click",function(){
-  var id=QPREC,n=QPSEL,r=recById(id);closeQP();if(!r)return;
+function qpValidate(n){
+  var id=QPREC,r=recById(id);closeQP();if(!r)return;
   var had=S.dishes.indexOf(id)>=0;
   if(had&&n===getQ(id)){tab("liste");return}
   snap(had?"Quantité modifiée":"Recette ajoutée");
   if(addRecipe(r,n)){save();render()}
   tab("liste");
+}
+
+function rUnfold(d){
+  document.querySelectorAll("#recipes details.rcp").forEach(function(o){if(o!==d&&o.open&&!o._closing)rFold(o)});
+  ROPEN={};ROPEN[d.dataset.id]=true;
+  if(d._a)d._a.cancel();
+  d._closing=false;d.classList.remove("closing");
+  var b=d.querySelector(".rbody");d.open=true;
+  if(RM)return;
+  var cs=getComputedStyle(b),h=cs.height,pb=cs.paddingBottom;
+  b.style.overflow="hidden";
+  var a=d._a=b.animate([{height:"0px",paddingBottom:"0px",opacity:0},{height:h,paddingBottom:pb,opacity:1}],{duration:260,easing:"ease"});
+  a.onfinish=a.oncancel=function(){b.style.overflow="";if(d._a===a)d._a=null};
+}
+function rFold(d){
+  ROPEN[d.dataset.id]=false;
+  var b=d.querySelector(".rbody");
+  if(d._a)d._a.cancel();
+  if(RM){d.open=false;return}
+  d._closing=true;d.classList.add("closing");
+  var cs=getComputedStyle(b),h=cs.height,pb=cs.paddingBottom;
+  b.style.overflow="hidden";
+  var a=d._a=b.animate([{height:h,paddingBottom:pb,opacity:1},{height:"0px",paddingBottom:"0px",opacity:0}],{duration:220,easing:"ease",fill:"forwards"});
+  a.onfinish=function(){d.open=false;d._closing=false;d.classList.remove("closing");a.cancel();b.style.overflow="";if(d._a===a)d._a=null};
+}
+document.addEventListener("click",function(e){
+  var t=e.target;if(!t.closest||t.closest(".radd"))return;
+  var sm=t.closest("#recipes details.rcp>summary");if(!sm)return;
+  e.preventDefault();
+  var d=sm.parentNode;
+  if(d.open&&!d._closing)rFold(d);else rUnfold(d);
 });
 var RLP=null,RDR=null,RNC=false;
 function rStart(e){
@@ -1212,7 +1243,7 @@ function rStart(e){
 }
 function rBegin(){
   var f=RLP.f,cy=RLP.y;clearTimeout(RLP.w);f.classList.add("wig");
-  document.querySelectorAll("#recipes details.rcp").forEach(function(o){o.open=false});
+  document.querySelectorAll("#recipes details.rcp").forEach(function(o){if(o._a)o._a.cancel();o._closing=false;o.classList.remove("closing");o.open=false});
   ROPEN={};
   if(navigator.vibrate)navigator.vibrate(20);
   f.classList.add("drag");
@@ -1367,7 +1398,7 @@ function renderRecipes(){
   S.recipes.forEach(function(r){
     var d=el("details","rcp");d.dataset.id=r.id;
     if(ROPEN[r.id])d.open=true;
-    d.addEventListener("toggle",function(){ROPEN[r.id]=d.open});
+    
     var sm=el("summary");
     var nm=el("span","rn");nm.appendChild(el("span","rt",r.name));
     var q=S.dishes.indexOf(r.id)>=0?getQ(r.id):0;
@@ -1375,8 +1406,9 @@ function renderRecipes(){
     var add=el("button","radd","+");add.type="button";add.dataset.act="usereci";add.dataset.id=r.id;add.setAttribute("aria-label","Ajouter "+r.name+" à la liste");
     sm.appendChild(nm);sm.appendChild(add);d.appendChild(sm);
     var body=el("div","rbody"),ul=el("ul");
-    r.items.forEach(function(it){var li=el("li");li.appendChild(el("span",null,it.name));var hh=findHabit(it.name);li.appendChild(el("em",null,hh?hh.cat:it.cat));ul.appendChild(li)});
+    r.items.forEach(function(it){var li=el("li");li.appendChild(el("span",null,it.name));;ul.appendChild(li)});
     body.appendChild(ul);
+    if(r.link){var la=el("a","rlink","Voir la recette ↗");la.href=r.link;la.target="_blank";la.rel="noopener noreferrer";body.appendChild(la)}
     if(r.note)body.appendChild(el("div","rnote",r.note));
     var act=el("div","ract");
     var ed=el("button","lnk","Modifier");ed.type="button";ed.dataset.act="editreci";ed.dataset.id=r.id;
@@ -1426,7 +1458,7 @@ var EDIT=null;
 function openRecipePage(id){
   var r=id?S.recipes.filter(function(x){return x.id===id})[0]:null;
   EDIT=r?r.id:null;DRAFT=r?r.items.map(function(i){return {name:i.name,cat:i.cat}}):[];
-  $("rName").value=r?r.name:"";$("rNote").value=r&&r.note?r.note:"";$("rIng").value="";$("rCat").value="Autre";
+  $("rName").value=r?r.name:"";$("rNote").value=r&&r.note?r.note:"";$("rLink").value=r&&r.link?r.link:"";$("rIng").value="";$("rCat").value="Autre";
   $("rTitle").textContent=r?"Modifier la recette":"Nouvelle recette";
   $("rSave").textContent=r?"Enregistrer les modifications":"Enregistrer la recette";
   renderDraft();rSuggest();openOvl("rpage");
@@ -1438,8 +1470,10 @@ function saveRecipe(){
   var n=$("rName").value.trim();
   if($("rIng").value.trim())addDraft();
   if(!n||!DRAFT.length){alert("Donnez un nom à la recette et ajoutez au moins un ingrédient.");return}
-  var nt=$("rNote").value.trim();
-  if(EDIT){S.recipes.forEach(function(r){if(r.id===EDIT){r.name=n;r.items=DRAFT.slice();if(nt)r.note=nt;else delete r.note}})}else{var nr={id:uid(),name:n,items:DRAFT.slice()};if(nt)nr.note=nt;S.recipes.push(nr)}
+  var nt=$("rNote").value.trim(),lk=$("rLink").value.trim();
+  if(lk&&!/^https?:\/\//i.test(lk))lk="https://"+lk;
+  if(lk&&!/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(lk))lk="";
+  if(EDIT){S.recipes.forEach(function(r){if(r.id===EDIT){r.name=n;r.items=DRAFT.slice();if(nt)r.note=nt;else delete r.note;if(lk)r.link=lk;else delete r.link}})}else{var nr={id:uid(),name:n,items:DRAFT.slice()};if(nt)nr.note=nt;if(lk)nr.link=lk;S.recipes.push(nr)}
   DRAFT.forEach(function(x){if(!findHabit(x.name))S.habits.push({id:uid(),name:x.name,cat:x.cat,count:0})});
   closeForm();save();render();
 }
