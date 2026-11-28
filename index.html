@@ -204,7 +204,8 @@ body.store #dock .addr{display:none}
 .recipe{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .dq{color:var(--muted);font-size:.85em;margin-left:6px}
 #qsheet,#csheet{position:fixed;inset:0;z-index:40}
-#catlist{max-height:55vh;overflow-y:auto;margin-top:4px}
+#csheet .qs-panel{max-height:92vh;overflow-y:auto}
+#catlist{margin-top:4px}
 .copt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 6px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;font-size:16px;text-align:left;cursor:pointer}
 .copt:last-child{border-bottom:0}
 .copt svg{color:var(--muted);flex:none}
@@ -219,6 +220,10 @@ body.store #dock .addr{display:none}
 #sMsg{color:var(--muted);font-size:14px;margin:4px 0 12px;min-height:20px}
 #sRes{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:8px}
 #sRes[hidden]{display:none}
+.csrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+.csrow .ghost{margin:0;flex:none;width:auto;border:0;background:none;padding:8px 0;color:var(--muted);font-weight:400;font-size:14px;text-decoration:none;cursor:pointer}
+.csrow .scanb{width:32px;height:32px;border:0;background:none;color:var(--muted);opacity:.7}
+.csrow .scanb svg{width:18px;height:18px}
 #sBrief{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
 #sBrief[hidden]{display:none}
 .fsc{display:flex;gap:10px;margin:12px 0}
@@ -623,7 +628,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="qs-sub">Prix, notes et rayon</div>
     <label class="csl"><span>Prix</span><input id="csPrice" class="csnote" inputmode="decimal" placeholder="Prix (€)" autocomplete="off" enterkeyhint="done"></label>
     <label class="csl"><span>Notes</span><input id="csNote" class="csnote" placeholder="Notes (2 kg, bio…)" maxlength="60" autocomplete="off" enterkeyhint="done"></label>
-    <button class="ghost" id="csFiche" type="button" style="margin:0 0 10px" hidden>Fiche produit</button>
+    <div class="csrow"><button class="ghost" id="csFiche" type="button">Afficher la fiche produit</button><button class="scanb" id="csScan" type="button" aria-label="Scanner le code-barres"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8"/></svg></button></div>
     <div id="catlist"></div>
   </div>
 </div>
@@ -1169,7 +1174,7 @@ document.addEventListener("touchcancel",qEnd);
 document.addEventListener("mouseup",qEnd);
 document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#recipes .rcp"))e.preventDefault()});
 document.addEventListener("click",function(e){if(QNOCLICK&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
-var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false,CFICHE=null;
+var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false;
 function openCat(name){
   CNAME=name;COPEN=Date.now();CHOLD=true;
   var h=findHabit(name),li=S.list.filter(function(i){return norm(i.name)===norm(name)})[0];
@@ -1177,7 +1182,7 @@ function openCat(name){
   $("csName").textContent=name;
   $("csNote").value=(li&&li.note)||(h&&h.note)||"";
   $("csPrice").value=h&&h.price>0?String(h.price).replace(".",","):"";
-  CFICHE=h&&h.code&&S.codes[h.code]&&S.codes[h.code].info?h.code:null;$("csFiche").hidden=!CFICHE;
+
   var box=$("catlist");box.textContent="";
   CATS.forEach(function(c){
     var b=el("button","copt");b.type="button";b.dataset.cat=c;
@@ -1198,7 +1203,13 @@ function saveNote(){
   if(ch)save();return ch;
 }
 function closeCat(){var ch=saveNote();$("csheet").hidden=true;CNAME=null;if(ch)render()}
-$("csFiche").addEventListener("click",function(){if(Date.now()-COPEN<400)return;var c=CFICHE;closeCat();if(c)openFiche(c)});
+$("csFiche").addEventListener("click",function(){
+  if(Date.now()-COPEN<400)return;
+  var n=CNAME;closeCat();if(!n)return;
+  var h=findHabit(n),c=h&&h.code&&S.codes[h.code];
+  if(c&&c.info)openFiche(h.code);else openScan("link",n);
+});
+$("csScan").addEventListener("click",function(){if(Date.now()-COPEN<400)return;var n=CNAME;closeCat();if(n)openScan("link",n)});
 $("csNote").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();closeCat()}});
 $("csPrice").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();closeCat()}});
 function setCat(name,cat){
@@ -1457,8 +1468,8 @@ function scanLoop(){
     else SC.t=setTimeout(scanLoop,250);
   }).catch(function(){SC.t=setTimeout(scanLoop,400)});
 }
-function openScan(mode){
-  SC.mode=mode==="recipe"?"recipe":"products";
+function openScan(mode,name){
+  SC.mode=mode==="recipe"?"recipe":mode==="link"?"link":"products";SC.link=mode==="link"?name:null;
   openOvl("scan");SC.busy=false;SC.code=null;$("sRes").hidden=true;$("sCode").value="";sMsg("");
   $("sVidBox").hidden=false;
   if(!("BarcodeDetector" in window)||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
@@ -1469,7 +1480,7 @@ function openScan(mode){
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false}).then(function(st){
     if($("scan").hidden){st.getTracks().forEach(function(k){k.stop()});return}
     SC.stream=st;var v=$("sVid");v.srcObject=st;v.play().catch(function(){});
-    sMsg("Placez le code-barres dans le cadre.");scanLoop();
+    sMsg(SC.mode==="link"?"Scannez le code-barres de « "+SC.link+" ».":"Placez le code-barres dans le cadre.");scanLoop();
   }).catch(function(){$("sVidBox").hidden=true;sMsg("Caméra inaccessible : autorisez-la ou saisissez le code-barres ci-dessous.")});
 }
 
@@ -1529,21 +1540,31 @@ function scanShow(code,info,msg){
   $("sRes").hidden=false;sMsg(msg||"");
   if(!info.name)$("sName").focus();
 }
+function linkDone(code,info){
+  var h=findHabit(SC.link||"");
+  if(!h){SC.busy=false;toast("Article introuvable");return}
+  h.code=code;
+  var c=S.codes[code]||{};c.name=h.name;c.cat=h.cat;if(info)c.info=info;S.codes[code]=c;
+  save();closeScan();
+  if(c.info)openFiche(code);else toast("Code enregistré, mais aucune donnée trouvée pour ce produit");
+}
 function scanFound(code){
   if(SC.busy)return;SC.busy=true;
   if(navigator.vibrate)navigator.vibrate(30);
   var known=S.codes&&S.codes[code];
-  if(known){scanShow(code,known,"Produit déjà reconnu.");return}
+  if(SC.mode==="link"&&known&&known.info){linkDone(code,known.info);return}
+  if(known&&SC.mode!=="link"){scanShow(code,known,"Produit déjà reconnu.");return}
   sMsg("Recherche du produit…");
   var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){if(ctl)ctl.abort()},6000);
   fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields=product_name,product_name_fr,brands,quantity,categories_tags,nutriscore_grade,nova_group,ecoscore_grade,ingredients_text,ingredients_text_fr,additives_tags,allergens_tags,nutriments,image_front_small_url",ctl?{signal:ctl.signal}:{})
   .then(function(r){return r.json()}).then(function(d){
     clearTimeout(to);
     var pr=d&&d.status===1&&d.product;
+    if(SC.mode==="link"){linkDone(code,offInfo(pr));return}
     var nm=pr?String(pr.product_name_fr||pr.product_name||"").trim():"";
     if(nm)scanShow(code,{name:nm.slice(0,60),cat:guessCat(pr.categories_tags),info:offInfo(pr)},"Vérifiez le nom et le rayon.");
     else scanShow(code,{name:"",cat:"Autre"},"Produit introuvable : donnez-lui un nom.");
-  }).catch(function(){clearTimeout(to);scanShow(code,{name:"",cat:"Autre"},"Recherche impossible (connexion ?) : donnez un nom au produit.")});
+  }).catch(function(){clearTimeout(to);if(SC.mode==="link"){SC.busy=false;sMsg("Recherche impossible (connexion ?). Réessayez.");return}scanShow(code,{name:"",cat:"Autre"},"Recherche impossible (connexion ?) : donnez un nom au produit.")});
 }
 function scanResume(){SC.busy=false;SC.code=null;SC.info=null;$("sRes").hidden=true;$("sCode").value="";$("sPrice").value="";sMsg(SC.stream?"Placez le code-barres dans le cadre.":"");if(SC.stream)scanLoop()}
 $("scanBtn").addEventListener("click",function(){openScan("products")});
