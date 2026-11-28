@@ -205,12 +205,11 @@ body.store #dock .addr{display:none}
 .dq{color:var(--muted);font-size:.85em;margin-left:6px}
 #qsheet,#csheet{position:fixed;inset:0;z-index:40}
 #csheet .qs-panel{max-height:92vh;overflow-y:auto}
-#catlist{margin-top:4px}
+.csl select{display:block;font-weight:400;font-size:16px;color:var(--ink);height:46px}
 .copt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 6px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;font-size:16px;text-align:left;cursor:pointer}
 .copt:last-child{border-bottom:0}
 .copt svg{color:var(--muted);flex:none}
 .copt .ck{margin-left:auto;font-weight:700}
-.add input.pp{flex:0 0 88px;width:88px}
 .srow{display:flex;gap:8px;margin:0 0 12px}
 .psearch{flex:1 1 auto;margin:0;border-radius:22px;padding:10px 16px;height:42px}
 .scanb{flex:none;width:42px;height:42px;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
@@ -336,8 +335,6 @@ nav button[aria-selected="true"]{color:var(--ink)}
 #dock .addr{display:flex;gap:8px}
 #dock input{flex:1 1 auto;border-radius:22px;padding:0 16px;height:44px}
 #dock select{flex:none;width:auto;max-width:118px;height:44px;border-radius:22px;padding:0 10px;font-size:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-overflow:ellipsis}
-#dock .newprice{height:40px;flex:none;width:100%;font-size:14px}
-#dock .newprice[hidden]{display:none}
 #dock .plus2{width:44px;height:44px;border-radius:50%;flex:none;padding:0;font-size:22px;line-height:1}
 .fin{height:46px;border-radius:23px;background:var(--ink);color:var(--bg);border:0;font:inherit;font-weight:600;cursor:pointer}
 .fin:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -475,7 +472,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <select id="newCat" aria-label="Rayon"></select>
     <button class="main plus2" id="addBtn" aria-label="Ajouter">+</button>
   </div>
-  <input id="newPrice" class="newprice" inputmode="decimal" placeholder="Prix en € (facultatif)" autocomplete="off" enterkeyhint="done" hidden>
 </div></div>
 <datalist id="sugg"></datalist>
 <div id="plan" class="ov" hidden role="dialog" aria-label="Planning de la semaine">
@@ -630,7 +626,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <label class="csl"><span>Prix</span><input id="csPrice" class="csnote" inputmode="decimal" placeholder="Prix (€)" autocomplete="off" enterkeyhint="done"></label>
     <label class="csl"><span>Notes</span><input id="csNote" class="csnote" placeholder="Notes (2 kg, bio…)" maxlength="60" autocomplete="off" enterkeyhint="done"></label>
     <div class="csrow"><button class="ghost" id="csFiche" type="button">Afficher la fiche produit</button><button class="scanb" id="csScan" type="button" aria-label="Scanner le code-barres"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8"/></svg></button></div>
-    <div id="catlist"></div>
+    <label class="csl"><span>Rayon</span><select id="csCat" class="csnote"></select></label>
+    <button class="main" id="csOk" type="button" style="width:100%">OK</button>
   </div>
 </div>
 <div id="toast" hidden role="status" aria-live="polite"></div>
@@ -808,8 +805,7 @@ function renderChips(){
     var row=el("div","add");row.hidden=true;
     var inp=el("input");inp.placeholder="Nom de l’article";inp.dataset.cat=c;inp.setAttribute("aria-label","Nouvel article : "+c);
     var btn=el("button","main","Ajouter");btn.dataset.act="folderadd";btn.dataset.cat=c;
-    var pi=el("input","pp");pi.type="text";pi.inputMode="decimal";pi.placeholder="Prix €";pi.dataset.cat=c;pi.setAttribute("aria-label","Prix (facultatif)");
-    row.appendChild(inp);row.appendChild(pi);row.appendChild(btn);body.appendChild(plus);body.appendChild(row);
+    row.appendChild(inp);row.appendChild(btn);body.appendChild(plus);body.appendChild(row);
     d.appendChild(body);box.appendChild(d);
   });
   if(SQ&&!found)box.appendChild(el("div","empty","Aucun produit trouvé."));
@@ -1175,7 +1171,7 @@ document.addEventListener("touchcancel",qEnd);
 document.addEventListener("mouseup",qEnd);
 document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#recipes .rcp"))e.preventDefault()});
 document.addEventListener("click",function(e){if(QNOCLICK&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
-var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false;
+var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false,CSEL=null;
 function openCat(name){
   CNAME=name;COPEN=Date.now();CHOLD=true;
   var h=findHabit(name),li=S.list.filter(function(i){return norm(i.name)===norm(name)})[0];
@@ -1184,13 +1180,7 @@ function openCat(name){
   $("csNote").value=(li&&li.note)||(h&&h.note)||"";
   $("csPrice").value=h&&h.price>0?String(h.price).replace(".",","):"";
 
-  var box=$("catlist");box.textContent="";
-  CATS.forEach(function(c){
-    var b=el("button","copt");b.type="button";b.dataset.cat=c;
-    b.insertAdjacentHTML("afterbegin",ICONS[c]||ICONS["Autre"]);b.appendChild(el("span",null,c));
-    if(c===cur)b.appendChild(el("span","ck","✓"));
-    box.appendChild(b);
-  });
+  var sc=$("csCat");sc.textContent="";fillCats(sc);sc.value=cur;CSEL=cur;
   $("csheet").hidden=false;
 }
 function saveNote(){
@@ -1203,7 +1193,12 @@ function saveNote(){
   if(h&&(h.price||null)!==pr){if(pr)h.price=pr;else delete h.price;ch=true}
   if(ch)save();return ch;
 }
-function closeCat(){var ch=saveNote();$("csheet").hidden=true;CNAME=null;if(ch)render()}
+function closeCat(){
+  var n=CNAME,sel=CSEL,ch=saveNote();
+  $("csheet").hidden=true;CNAME=null;CSEL=null;
+  var moved=n&&sel?setCat(n,sel):false;
+  if(ch&&!moved)render();
+}
 $("csFiche").addEventListener("click",function(){
   if(Date.now()-COPEN<400)return;
   var n=CNAME;closeCat();if(!n)return;
@@ -1215,16 +1210,14 @@ $("csNote").addEventListener("keydown",function(e){if(e.key==="Enter"){e.prevent
 $("csPrice").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();closeCat()}});
 function setCat(name,cat){
   var h=findHabit(name),cur=h?h.cat:null;
-  if(cur===cat){return}
+  if(cur===cat){return false}
   snap("Article déplacé");
   if(h)h.cat=cat;else S.habits.push({id:uid(),name:name,cat:cat,count:0});
   S.list.forEach(function(i){if(norm(i.name)===norm(name))i.cat=cat});
-  OPEN[cat]=true;save();render();
+  OPEN[cat]=true;save();render();return true;
 }
-$("catlist").addEventListener("click",function(e){
-  var b=e.target.closest(".copt");if(!b||Date.now()-COPEN<400)return;
-  var n=CNAME;saveNote();closeCat();if(n)setCat(n,b.dataset.cat);
-});
+$("csCat").addEventListener("change",function(){CSEL=this.value});
+$("csOk").addEventListener("click",function(){if(Date.now()-COPEN<400)return;closeCat()});
 document.querySelector("#csheet .qs-back").addEventListener("click",function(){if(Date.now()-COPEN>400)closeCat()});
 function cStart(e){
   if(e.type==="mousedown"&&e.button!==0)return;
@@ -1395,7 +1388,7 @@ document.addEventListener("click",function(e){
     }else render();
   }
   else if(a==="showadd"){var rw=t.nextSibling;t.hidden=true;rw.hidden=false;rw.firstChild.focus()}
-  else if(a==="folderadd"){var rw2=t.parentNode;addFood(rw2.children[0].value,t.dataset.cat,parsePrice(rw2.children[1].value))}
+  else if(a==="folderadd"){var rw2=t.parentNode;addFood(rw2.children[0].value,t.dataset.cat)}
   else if(a==="remove"){snap("Article retiré");S.list=S.list.filter(function(i){return i.id!==id});save();render()}
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
   else if(a==="deldish"){removeDish(id)}
@@ -1417,7 +1410,7 @@ document.addEventListener("change",function(e){
 document.addEventListener("keydown",function(e){
   var t=e.target;if(e.key!=="Enter"||!t.dataset||!t.dataset.cat||t.tagName!=="INPUT")return;
   var rw3=t.parentNode;if(!rw3.children[0].value.trim())return;
-  addFood(rw3.children[0].value,t.dataset.cat,parsePrice(rw3.children[1].value));
+  addFood(rw3.children[0].value,t.dataset.cat);
 });
 function parsePrice(v){var x=parseFloat(String(v||"").replace(",","."));return isNaN(x)||x<=0?null:Math.round(x*100)/100}
 function addFood(name,cat,price){
@@ -1427,13 +1420,11 @@ function addFood(name,cat,price){
   OPEN[cat]=true;addToList(name,cat);
 }
 function submitItem(){
-  var v=$("newItem").value,pr=parsePrice($("newPrice").value);
+  var v=$("newItem").value;
   addToList(v,$("newCat").value);
-  if(pr&&v.trim()){var h=findHabit(v);if(h){h.price=pr;save()}}
-  $("newItem").value="";$("newPrice").value="";$("newPrice").hidden=true;$("newCat").value="Autre";$("newItem").focus();
+  $("newItem").value="";$("newCat").value="Autre";$("newItem").focus();
 }
-$("newPrice").addEventListener("keydown",function(e){if(e.key==="Enter")submitItem()});
-$("newItem").addEventListener("input",function(){var h=findHabit(this.value);if(h){$("newCat").value=h.cat;if(h.price>0&&!$("newPrice").value)$("newPrice").value=String(h.price).replace(".",",")}$("newPrice").hidden=!this.value.trim()});
+$("newItem").addEventListener("input",function(){var h=findHabit(this.value);if(h)$("newCat").value=h.cat});
 $("addBtn").addEventListener("click",submitItem);
 $("pSearch").addEventListener("input",function(){SQ=norm(this.value);renderChips()});
 $("newItem").addEventListener("keydown",function(e){if(e.key==="Enter")submitItem()});
