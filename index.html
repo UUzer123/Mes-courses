@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" data-ui="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,16 +7,14 @@
 <meta name="theme-color" content="#111111">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Courses">
-<script>try{if(localStorage.getItem("courses-theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+<script>try{if(localStorage.getItem("courses-theme")==="light")document.documentElement.setAttribute("data-ui","light")}catch(e){}</script>
 <title>Mes courses</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Cormorant+Garamond:wght@500;600&display=swap">
 <style>
 :root{--bg:#F3F3F3;--surface:#FFFFFF;--ink:#111111;--muted:#777777;--line:#E4E4E4;--accent:#111111;--on-accent:#FFFFFF;--chip:#111111;--chip-ink:#FFFFFF;--done:#A0A0A0;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E0E0E;--surface:#171717;--ink:#EDEDED;--muted:#8A8A8A;--line:#272727;--accent:#EDEDED;--on-accent:#111111;--chip:#EDEDED;--chip-ink:#111111;--done:#666666}}
-:root[data-theme="dark"]{--bg:#0E0E0E;--surface:#171717;--ink:#EDEDED;--muted:#8A8A8A;--line:#272727;--accent:#EDEDED;--on-accent:#111111;--chip:#EDEDED;--chip-ink:#111111;--done:#666666;color-scheme:dark}
+:root[data-ui="dark"]{--bg:#0E0E0E;--surface:#171717;--ink:#EDEDED;--muted:#8A8A8A;--line:#272727;--accent:#EDEDED;--on-accent:#111111;--chip:#EDEDED;--chip-ink:#111111;--done:#666666;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.4}
@@ -253,7 +251,7 @@ nav button[aria-selected="true"]{color:var(--ink)}
 .grp .n{margin-left:auto;font-size:12px}
 .li{display:flex;align-items:center;gap:12px;min-height:48px;border-bottom:1px solid var(--line)}
 .li .box{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink);background:none;flex:none;cursor:pointer;color:var(--bg);font-size:14px;line-height:1;padding:0}
-.li.done .box{background:var(--ink)}
+.li.done .box{background:none;border-color:transparent;color:var(--ink)}
 .li .name{flex:1;cursor:pointer}
 .li .tx{position:relative;display:inline-block;transition:color .3s ease}
 .li .tx::after{content:"";position:absolute;left:-1px;right:-1px;top:54%;height:1.5px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
@@ -286,8 +284,8 @@ button.ghost{font:inherit;font-weight:600;background:none;color:var(--accent);bo
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font:inherit;background:var(--chip);color:var(--chip-ink);border:0;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600}
-.folder{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden}
-.folder summary{list-style:none;display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:14px;font-weight:600;cursor:pointer}
+.folder{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.folder summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:16px;font-weight:600;cursor:pointer}
 .folder summary .nm{flex:1}
 .folder summary svg{flex:none;color:var(--muted)}
 .folder summary::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform .25s ease,margin .25s ease}
@@ -296,9 +294,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media (prefers-reduced-motion:reduce){.folder summary::after{transition:none}}
 .folder summary::-webkit-details-marker{display:none}
 .folder summary:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
-.badge{background:var(--chip);color:var(--chip-ink);border-radius:999px;font-size:12px;padding:1px 8px}
-.folder .body{padding:0 12px 8px;display:flex;flex-direction:column;gap:2px}
-.plus{font:inherit;font-size:14px;margin-top:4px;font-weight:600;background:none;border:1px dashed var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;text-align:left}
+.badge{background:var(--chip);color:var(--chip-ink);border-radius:999px;font-size:13px;padding:2px 9px}
+.folder .body{padding:0 14px 10px;display:flex;flex-direction:column;gap:2px}
+.plus{font:inherit;font-size:15px;margin-top:6px;font-weight:600;background:none;border:1px dashed var(--line);color:var(--muted);border-radius:8px;padding:8px 12px;cursor:pointer;text-align:left}
 .plus:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .opt .del{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
 .recipe{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
@@ -309,10 +307,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .recipe .del{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
 .form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .form>input{width:100%}
-.opt{position:relative;display:flex;align-items:center;gap:10px;padding:4px 0;font-size:15px;cursor:pointer}
+.opt{position:relative;display:flex;align-items:center;gap:12px;padding:7px 0;font-size:16px;cursor:pointer}
 .opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
-.cb{flex:none;width:11px;height:11px;margin:0 3px;border-radius:50%;border:1.5px solid var(--muted);transition:background .15s ease,border-color .15s ease}
-.opt input:checked+.cb{background:var(--ink);border-color:var(--ink)}
+.cb{flex:none;width:13px;height:13px;margin:0 3px;border-radius:50%;border:1.5px solid var(--muted);transition:background .15s ease,border-color .15s ease}
+.cb{position:relative}
+.cb::after{content:"";position:absolute;left:3.5px;top:0.5px;width:3px;height:6px;border:solid var(--ink);border-width:0 1.8px 1.8px 0;transform:rotate(45deg) scale(0);opacity:0;transition:transform .18s ease,opacity .18s ease}
+.opt input:checked+.cb{border-color:transparent}
+.opt input:checked+.cb::after{transform:rotate(45deg) scale(1);opacity:1}
 .opt input:checked~span{font-weight:600}
 .opt input:focus-visible+.cb{outline:3px solid var(--accent);outline-offset:2px}
 .opt span{flex:1}
@@ -323,7 +324,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .row:last-child{border-bottom:0}
 .row .name{flex:1;cursor:pointer}
 .row .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--accent);background:none;flex:none;cursor:pointer;color:var(--on-accent);font-size:16px;line-height:1;padding:0}
-.row.done .box{background:var(--accent)}
+.row.done .box{background:none;border-color:transparent;color:var(--accent)}
 .row.done .name{color:var(--done);text-decoration:line-through}
 .row .meta{color:var(--muted);font-size:14px}
 .row .del{background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px}
@@ -577,7 +578,7 @@ function addToList(name,cat){
   save();render();
 }
 var OPEN={};
-function ic(p){return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+function ic(p){return '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
 var ICONS={
 "Fruits & légumes":ic('<path d="M12 7c-2-2-6-1.5-7 2-1 3.5 1 9 4 11 1.5 1 2.2.5 3 .5s1.5.5 3-.5c3-2 5-7.5 4-11-1-3.5-5-4-7-2z"/><path d="M12 7c0-2 1-4 3-5"/>'),
 "Frais":ic('<path d="M8 3h8l1 4v13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V7z"/><path d="M7 7h10"/><path d="M10 13h4"/>'),
@@ -1091,7 +1092,7 @@ document.addEventListener("keydown",function(e){
 });
 var SUN='<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>';
 var MOON='<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>';
-function curTheme(){return document.documentElement.getAttribute("data-theme")==="light"?"light":"dark"}
+function curTheme(){return document.documentElement.getAttribute("data-ui")==="light"?"light":"dark"}
 function themeUI(){
   var l=curTheme()==="light";
   $("themeLbl").textContent=l?"Mode sombre":"Mode clair";
@@ -1099,7 +1100,7 @@ function themeUI(){
   var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",l?"#F3F3F3":"#111111");
 }
 function applyTheme(t){
-  document.documentElement.setAttribute("data-theme",t);
+  document.documentElement.setAttribute("data-ui",t);
   try{localStorage.setItem("courses-theme",t)}catch(e){}
   themeUI();
 }
