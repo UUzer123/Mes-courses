@@ -40,10 +40,6 @@ body.store #dock .addr{display:none}
 .logo:focus-visible{outline:3px solid var(--accent);outline-offset:-2px;border-radius:10px}
 .ov{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);animation:planIn .25s ease}
 @keyframes planIn{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
-#impText{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;resize:vertical}
-#rImp{display:flex;flex-direction:column;gap:8px}
-#rImp[hidden]{display:none}
-#impMsg{color:var(--muted);font-size:14px;min-height:18px}
 #rNote{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;resize:vertical;min-height:96px}
 .rnote{white-space:pre-wrap;font-size:14px;color:var(--muted);margin:8px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
 #rpage .form>*{flex:none}
@@ -556,13 +552,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="pin">
     <div class="phead"><button class="pback" data-close="rpage" aria-label="Retour">‹</button><h1 id="rTitle">Nouvelle recette</h1></div>
     <div class="form">
-      <button class="ghost" id="impOpen" type="button" style="margin-top:0">Importer depuis le web</button>
-      <div id="rImp" hidden>
-        <textarea id="impText" rows="3" placeholder="Collez le lien d’une recette, ou sa liste d’ingrédients (un par ligne)"></textarea>
-        <button class="main" id="impGo" type="button">Importer</button>
-        <button class="ghost" id="impSearch" type="button" style="margin-top:0">Chercher en ligne</button>
-        <div id="impMsg"></div>
-      </div>
       <input id="rName" placeholder="Nom de la recette" autocomplete="off">
       <div class="add">
         <input id="rIng" placeholder="Ingrédient" autocomplete="off" enterkeyhint="done">
@@ -1316,7 +1305,7 @@ var EDIT=null;
 function openRecipePage(id){
   var r=id?S.recipes.filter(function(x){return x.id===id})[0]:null;
   EDIT=r?r.id:null;DRAFT=r?r.items.map(function(i){return {name:i.name,cat:i.cat}}):[];
-  $("rImp").hidden=true;$("impText").value="";$("impMsg").textContent="";$("rName").value=r?r.name:"";$("rNote").value=r&&r.note?r.note:"";$("rIng").value="";$("rCat").value="Autre";
+  $("rName").value=r?r.name:"";$("rNote").value=r&&r.note?r.note:"";$("rIng").value="";$("rCat").value="Autre";
   $("rTitle").textContent=r?"Modifier la recette":"Nouvelle recette";
   $("rSave").textContent=r?"Enregistrer les modifications":"Enregistrer la recette";
   renderDraft();rSuggest();openOvl("rpage");
@@ -1500,100 +1489,6 @@ $("sAdd").addEventListener("click",function(){
 $("sGo").addEventListener("click",function(){var v=$("sCode").value.replace(/\D/g,"");if(v.length<6){sMsg("Code trop court.");return}SC.busy=false;scanFound(v)});
 $("sCode").addEventListener("keydown",function(e){if(e.key==="Enter")$("sGo").click()});
 
-function nk(t){return String(t||"").toLowerCase().replace(/œ/g,"oe").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g," ").trim().replace(/s$/,"")}
-var UNITS="kg|g|gr|mg|l|cl|dl|ml|litres?|c\\.?\\s?à\\s?(?:s|c|soupe|café)\\.?|cuill?[eè]res?\\s+à\\s+(?:soupe|café)|cuill?[eè]res?|càs|càc|cas|cac|pincées?|sachets?|verres?|tasses?|bols?|tranches?|gousses?|boîtes?|boites?|pots?|bouquets?|branches?|morceaux?|paquets?|barquettes?|poignées?|rondelles?|bottes?|brins?|cubes?|dosettes?|tiges?|noix\\s+(?=de\\b|d['’])|zestes?|feuilles?|filets?";
-var UNIT_RE=new RegExp("^(?:"+UNITS+")\\b\\.?\\s*","i");
-function cleanIng(line){
-  var t=String(line||"").replace(/\(.*?\)/g," ").replace(/ /g," ").replace(/^[\s\-–•*·\d]+\.\s+/,"").trim();
-  t=t.split(/[,;]/)[0].replace(/^[\-–•*·]\s*/,"").trim();
-  t=t.replace(/^(?:environ|about|~)\s*/i,"");
-  t=t.replace(/^(?:\d+(?:[.,\/]\d+)?|[½¼¾⅓⅔])(?:\s*(?:à|-|–)\s*\d+(?:[.,\/]\d+)?)?\s*/,"").replace(/^(?:\d+\s*[½¼¾]\s*)/,"");
-  t=t.replace(UNIT_RE,"");
-  t=t.replace(/^(?:de la |de l['’]\s*|de |du |des |d['’]\s*)/i,"").trim();
-  t=t.replace(/\s+/g," ");
-  if(!t)return "";
-  t=t.charAt(0).toUpperCase()+t.slice(1);
-  return t.slice(0,50);
-}
-function frCat(n){
-  var t=nk(n)+" ";
-  if(/surgel|glace/.test(t))return "Surgelés";
-  if(/\b(vin|biere|jus|eau|rhum|cidre|soda|sirop)\b/.test(t))return "Boissons";
-  if(/oeuf|lait|beurre|creme|fromage|yaourt|jambon|lardon|poulet|boeuf|porc|veau|agneau|saumon|poisson|crevette|viande|mozzarella|parmesan|gruyere|chevre|steak|saucisse|dinde|thon frais|tofu/.test(t))return "Frais";
-  if(/tomate|oignon|carotte|pomme|poire|citron|\bail\b|courgette|aubergine|poivron|salade|champignon|persil|basilic|coriandre|menthe|ciboulette|poireau|banane|orange|fraise|framboise|epinard|chou|concombre|avocat|echalote|gingembre|patate|navet|radis|celeri|mangue|ananas|raisin|haricot vert/.test(t))return "Fruits & légumes";
-  if(/farine|sucre|\bsel\b|poivre|huile|vinaigre|pate|riz|semoule|chocolat|levure|miel|moutarde|sauce|conserve|epice|cannelle|vanille|amande|noix|lentille|pois chiche|bouillon|maizena|fecule|cacao|ble|quinoa|pain|biscuit|cereale|confiture|noisette|curry|paprika|cumin|thym|laurier|origan/.test(t))return "Épicerie";
-  return "Autre";
-}
-function ingToItem(line){
-  var n=cleanIng(line);if(!n)return null;
-  var k=nk(n),h=S.habits.filter(function(x){return nk(x.name)===k})[0];
-  return h?{name:h.name,cat:h.cat}:{name:n,cat:frCat(n)};
-}
-function ldFind(o){
-  if(!o||typeof o!=="object")return null;
-  if(Array.isArray(o)){for(var i=0;i<o.length;i++){var r=ldFind(o[i]);if(r)return r}return null}
-  var t=o["@type"];if(t&&(t==="Recipe"||(Array.isArray(t)&&t.indexOf("Recipe")>=0)))return o;
-  if(o["@graph"])return ldFind(o["@graph"]);
-  return null;
-}
-function htmlText(x){var d=document.createElement("div");d.innerHTML=String(x||"");return (d.textContent||"").replace(/\s+/g," ").trim()}
-function stepsOf(ins){
-  var out=[];
-  (function walk(v){
-    if(!v)return;
-    if(typeof v==="string"){var t=htmlText(v);if(t)out.push(t);return}
-    if(Array.isArray(v)){v.forEach(walk);return}
-    if(v.itemListElement)walk(v.itemListElement);else if(v.text)walk(v.text);else if(v.name)walk(v.name);
-  })(ins);
-  return out;
-}
-function parseRecipeHTML(html){
-  var doc=new DOMParser().parseFromString(html,"text/html"),rec=null;
-  var sc=doc.querySelectorAll('script[type="application/ld+json"]');
-  for(var i=0;i<sc.length&&!rec;i++){try{rec=ldFind(JSON.parse(sc[i].textContent))}catch(e){}}
-  if(!rec||!rec.recipeIngredient)return null;
-  var ings=[].concat(rec.recipeIngredient).map(htmlText).filter(Boolean);
-  var steps=stepsOf(rec.recipeInstructions);
-  return {name:htmlText(rec.name),ings:ings,steps:steps};
-}
-function importApply(name,ings,steps,src){
-  var added=0;
-  ings.forEach(function(l){var it=ingToItem(l);if(it&&!DRAFT.some(function(x){return nk(x.name)===nk(it.name)})){DRAFT.push(it);added++}});
-  if(name&&!$("rName").value.trim())$("rName").value=name.slice(0,60);
-  var note=[];
-  if(src){note.push("Quantités");ings.forEach(function(l){note.push("– "+l)})}
-  if(steps&&steps.length){note.push("");note.push("Préparation");steps.forEach(function(t,i){note.push((i+1)+". "+t)})}
-  if(src)note.push("","Source : "+src);
-  if(note.length){var cur=$("rNote").value.trim();$("rNote").value=(cur?cur+"\n\n":"")+note.join("\n").trim()}
-  renderDraft();rSuggest();
-  return added;
-}
-var PROXIES=[function(u){return "https://api.allorigins.win/raw?url="+encodeURIComponent(u)},function(u){return "https://corsproxy.io/?url="+encodeURIComponent(u)}];
-function fetchPage(url,i){
-  if(i>=PROXIES.length)return Promise.reject(new Error("fail"));
-  var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){if(ctl)ctl.abort()},12000);
-  return fetch(PROXIES[i](url),ctl?{signal:ctl.signal}:{}).then(function(r){clearTimeout(to);if(!r.ok)throw new Error("http");return r.text()}).catch(function(){clearTimeout(to);return fetchPage(url,i+1)});
-}
-function doImport(){
-  var v=$("impText").value.trim(),msg=$("impMsg");if(!v)return;
-  var m=v.match(/^https?:\/\/\S+$/i);
-  if(m){
-    msg.textContent="Recherche de la recette…";$("impGo").disabled=true;
-    fetchPage(v,0).then(function(html){
-      var r=parseRecipeHTML(html);
-      if(!r||!r.ings.length){msg.textContent="Aucune recette trouvée sur cette page. Collez plutôt la liste d’ingrédients.";return}
-      var n=importApply(r.name,r.ings,r.steps,v);
-      msg.textContent="";$("rImp").hidden=true;$("impText").value="";toast(n+" ingrédient"+(n>1?"s":"")+" importé"+(n>1?"s":"")+" · vérifiez les rayons");
-    }).catch(function(){msg.textContent="Impossible de récupérer cette page. Collez plutôt la liste d’ingrédients."}).then(function(){$("impGo").disabled=false});
-  }else{
-    var lines=v.split(/\n+/).map(function(x){return x.trim()}).filter(Boolean);
-    var n=importApply("",lines,[],"");
-    if(!n){msg.textContent="Aucun ingrédient reconnu.";return}
-    msg.textContent="";$("rImp").hidden=true;$("impText").value="";toast(n+" ingrédient"+(n>1?"s":"")+" importé"+(n>1?"s":"")+" · vérifiez les rayons");
-  }
-}
-$("impOpen").addEventListener("click",function(){var r=$("rImp");r.hidden=!r.hidden;if(!r.hidden)$("impText").focus()});
-$("impGo").addEventListener("click",doImport);
 var DAYS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],SEL=null,PG=null,PP=null,PNOCLICK=false,clr=null;
 function recById(id){return S.recipes.filter(function(x){return x.id===id})[0]}
 function openPlan(){SEL=null;renderPlan();$("plan").hidden=false;$("plan").scrollTop=0;$("planBack").focus()}
@@ -1764,36 +1659,6 @@ function hideSplash(){if(sp&&sp.parentNode){sp.parentNode.removeChild(sp);sp=nul
 sp.addEventListener("animationend",function(e){if(e.animationName==="splashOut")hideSplash()});
 sp.addEventListener("click",hideSplash);
 setTimeout(hideSplash,4000);
-
-var SEARCHING=false;
-function urlIn(t){var m=String(t||"").match(/https?:\/\/[^\s"'<>]+/i);return m?m[0]:""}
-$("impSearch").addEventListener("click",function(){
-  var q=$("rName").value.trim();var t=$("impText").value.trim();if(!q&&t&&!urlIn(t))q=t.split("\n")[0].slice(0,60);
-  var u="https://www.google.com/search?q="+encodeURIComponent("recette "+q);
-  SEARCHING=true;$("impMsg").textContent="Copiez le lien de la recette choisie, puis revenez ici.";
-  var w=null;try{w=window.open(u,"_blank","noopener")}catch(e){}
-  if(!w){SEARCHING=false;$("impMsg").textContent="Ouverture impossible ici : cherchez la recette dans votre navigateur puis collez son lien.";}
-});
-document.addEventListener("visibilitychange",function(){
-  if(document.hidden||!SEARCHING||$("rpage").hidden)return;
-  SEARCHING=false;$("rImp").hidden=false;
-  var msg=$("impMsg");msg.textContent="Collez le lien de la recette puis touchez Importer.";
-  if(navigator.clipboard&&navigator.clipboard.readText){
-    navigator.clipboard.readText().then(function(t){
-      var u=urlIn(t);if(u&&!$("rpage").hidden){$("impText").value=u;msg.textContent="Lien copié détecté : touchez Importer."}
-    }).catch(function(){});
-  }
-});
-function handleShare(){
-  var q;try{q=new URLSearchParams(location.search)}catch(e){return}
-  var u=urlIn(q.get("url"))||urlIn(q.get("text"))||urlIn(q.get("title"));
-  if(!u)return;
-  try{history.replaceState(null,"",location.pathname)}catch(e){}
-  if(typeof hideSplash==="function")hideSplash();
-  tab("recettes");openRecipePage(null);
-  $("rImp").hidden=false;$("impText").value=u;doImport();
-}
-handleShare();
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
 </body>
