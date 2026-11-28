@@ -33,6 +33,9 @@ body.store .qty,body.store .li .del{display:none}
 body.store .qn{display:inline}
 body.store .grp{font-size:15px}
 body.store #dock .addr{display:none}
+@keyframes wig{0%{rotate:-.3deg}50%{rotate:.3deg}100%{rotate:-.3deg}}
+.wig{animation:wig .15s ease-in-out infinite;transform-origin:50% 50%}
+@media (prefers-reduced-motion:reduce){.wig{animation:none}}
 .folder.drag{position:relative;z-index:3;border-color:var(--ink)}
 #chips summary{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .logo{position:absolute;top:20px;right:12px;width:44px;height:44px;padding:6px;background:none;border:0;cursor:pointer;z-index:2}
@@ -94,7 +97,7 @@ body.store #dock .addr{display:none}
 .radd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .rbody{padding:0 12px 10px}
 .rbody ul{list-style:none;margin:0;padding:0}
-.rbody li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:14px;border-top:1px solid var(--line)}
+.rbody li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:14px;border-top:1px solid var(--line)}
 .rbody li em{font-style:normal;color:var(--muted);font-size:12px}
 .ract{display:flex;justify-content:space-between;margin-top:6px}
 .ract .lnk{padding-left:0;padding-right:0}
@@ -203,6 +206,15 @@ body.store #dock .addr{display:none}
 @media (prefers-reduced-motion:reduce){.ttrack{transition:none}.sl.on *{animation:none!important}}
 .recipe{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .dq{color:var(--muted);font-size:.85em;margin-left:6px}
+#qpback{position:fixed;inset:0;z-index:39}
+#qpop{position:fixed;z-index:41;width:116px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeIn .15s ease}
+#qpop[hidden],#qpback[hidden]{display:none}
+.qpw{position:relative;height:108px}
+.qpw .wsel{top:36px;height:36px;left:6%;right:6%}
+.qpw .wlist{padding:36px 0}
+.qpw .wlist div{height:36px;line-height:36px;font-size:18px}
+.qpw .wlist div.on{font-size:20px}
+#qpOk{width:100%;padding:8px 0;border-radius:10px;font-size:14px}
 #qsheet,#csheet{position:fixed;inset:0;z-index:40}
 #csheet .qs-panel{max-height:92vh;overflow-y:auto}
 .csl select{display:block;font-weight:400;font-size:16px;color:var(--ink);height:46px}
@@ -461,7 +473,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </section>
   <section id="v-recettes" hidden>
     <h1>Mes recettes</h1>
-    <p class="sub">Touchez + pour ajouter une recette à votre liste, ou ouvrez-la pour voir ses ingrédients. Maintenez-la pour choisir la quantité.</p>
+    <p class="sub">Touchez + pour choisir la quantité et ajouter la recette à votre liste. Maintenez une recette pour la déplacer, ou un ingrédient pour ouvrir sa fiche (note, prix, rayon).</p>
     <div id="recipes"></div>
     <button class="ghost" id="newRecipeBtn">+ Nouvelle recette</button>
   </section>
@@ -609,6 +621,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div id="ficheBody"></div>
   </div>
 </div>
+<div id="qpback" hidden></div>
+<div id="qpop" hidden role="dialog" aria-label="Quantité">
+  <div class="qpw"><div class="wsel"></div><div class="wlist" id="qplist"></div></div>
+  <button class="main" id="qpOk" type="button">OK</button>
+</div>
 <div id="qsheet" hidden role="dialog" aria-label="Quantité de la recette">
   <div class="qs-back"></div>
   <div class="qs-panel">
@@ -734,10 +751,11 @@ function dStart(e){
   if(e.type==="mousedown"&&e.button!==0)return;
   var s=e.target.closest&&e.target.closest("#chips details.folder>summary");if(!s)return;
   var p=pxy(e);
-  LP={f:s.parentNode,x:p.x,y:p.y,t:setTimeout(dBegin,450)};
+  var ff=s.parentNode;
+  LP={f:ff,x:p.x,y:p.y,t:setTimeout(dBegin,450),w:setTimeout(function(){ff.classList.add("wig")},130)};
 }
 function dBegin(){
-  var f=LP.f,cy=LP.y;
+  var f=LP.f,cy=LP.y;clearTimeout(LP.w);f.classList.add("wig");
   document.querySelectorAll("#chips details.folder").forEach(function(o){if(o._a)o._a.cancel();o._closing=false;o.classList.remove("closing");o.open=false});
   OPEN={};
   if(navigator.vibrate)navigator.vibrate(20);
@@ -746,7 +764,7 @@ function dBegin(){
 }
 function dMove(e){
   var p=pxy(e);
-  if(LP){if(Math.abs(p.x-LP.x)>10||Math.abs(p.y-LP.y)>10){clearTimeout(LP.t);LP=null}else LP.y=p.y;return}
+  if(LP){if(Math.abs(p.x-LP.x)>10||Math.abs(p.y-LP.y)>10){clearTimeout(LP.t);clearTimeout(LP.w);LP.f.classList.remove("wig");LP=null}else LP.y=p.y;return}
   if(!DR)return;
   if(e.cancelable)e.preventDefault();
   var f=DR.f,cy=p.y;
@@ -763,11 +781,11 @@ function dMove(e){
   list.forEach(function(o){if(o===f)return;var d2=tops[fname(o)]-o.getBoundingClientRect().top;if(Math.abs(d2)>1)o.animate([{transform:"translateY("+d2+"px)"},{transform:"none"}],{duration:200,easing:"ease-out"})});
 }
 function dEnd(e){
-  if(LP){clearTimeout(LP.t);LP=null;return}
+  if(LP){clearTimeout(LP.t);clearTimeout(LP.w);LP.f.classList.remove("wig");LP=null;return}
   if(!DR)return;
   if(e.cancelable)e.preventDefault();
   var f=DR.f,tr=f.style.transform;
-  f.style.transform="";f.classList.remove("drag");
+  f.style.transform="";f.classList.remove("drag");f.classList.remove("wig");
   if(!RM)f.animate([{transform:tr},{transform:"none"}],{duration:180,easing:"ease-out"});
   S.order=[].slice.call($("chips").children).map(fname);
   save();renderList();
@@ -1150,27 +1168,93 @@ $("qsOk").addEventListener("click",function(){
   if(addRecipe(r,n)){save();render()}
   tab("liste");
 });
-function qStart(e){
-  if(e.type==="mousedown"&&e.button!==0)return;
-  var c=e.target.closest&&e.target.closest("#recipes .rcp");
-  if(!c||!e.target.closest("summary"))return;
-  var p=pxy(e);
-  QP={x:p.x,y:p.y,t:setTimeout(function(){
-    QP=null;QNOCLICK=true;if(navigator.vibrate)navigator.vibrate(15);
-    openQty(c.dataset.id);setTimeout(function(){QNOCLICK=false},700);
-  },450)};
+document.addEventListener("contextmenu",function(e){if(RLP||RDR||(e.target.closest&&e.target.closest("#recipes .rcp")))e.preventDefault()});
+document.addEventListener("click",function(e){if((QNOCLICK||RNC)&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
+
+var QPSEL=1,QPREC=null;
+function openQtyPop(id,btn){
+  var r=recById(id);if(!r)return;
+  var had=S.dishes.indexOf(id)>=0;
+  QPREC=id;QPSEL=had?getQ(id):1;
+  var wl=$("qplist");wl.textContent="";
+  for(var i=1;i<=20;i++){var d=el("div",null,String(i));d.dataset.v=String(i);wl.appendChild(d)}
+  $("qpOk").textContent=had?"Modifier":"Ajouter";
+  var pop=$("qpop");$("qpback").hidden=false;pop.hidden=false;
+  var rc=btn.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight;
+  var left=Math.max(8,Math.min(window.innerWidth-w-8,rc.right-w)),top=rc.bottom+6;
+  if(top+h>window.innerHeight-8)top=Math.max(8,rc.top-h-6);
+  pop.style.left=left+"px";pop.style.top=top+"px";
+  wl.scrollTop=(QPSEL-1)*36;markQP();
 }
-function qMove(e){if(!QP)return;var p=pxy(e);if(Math.abs(p.x-QP.x)>10||Math.abs(p.y-QP.y)>10){clearTimeout(QP.t);QP=null}}
-function qEnd(){if(QP){clearTimeout(QP.t);QP=null}}
-document.addEventListener("touchstart",qStart,{passive:true});
-document.addEventListener("mousedown",qStart);
-document.addEventListener("touchmove",qMove,{passive:true});
-document.addEventListener("mousemove",qMove);
-document.addEventListener("touchend",qEnd);
-document.addEventListener("touchcancel",qEnd);
-document.addEventListener("mouseup",qEnd);
-document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#recipes .rcp"))e.preventDefault()});
-document.addEventListener("click",function(e){if(QNOCLICK&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
+function markQP(){[].forEach.call($("qplist").children,function(c){c.classList.toggle("on",+c.dataset.v===QPSEL)})}
+function closeQP(){$("qpop").hidden=true;$("qpback").hidden=true;QPREC=null}
+$("qplist").addEventListener("scroll",function(){
+  var i=Math.max(0,Math.min(19,Math.round(this.scrollTop/36)))+1;
+  if(i!==QPSEL){QPSEL=i;markQP();if(navigator.vibrate)navigator.vibrate(4)}
+});
+$("qplist").addEventListener("click",function(e){var d=e.target.closest("[data-v]");if(d)this.scrollTo({top:(+d.dataset.v-1)*36,behavior:"smooth"})});
+$("qpback").addEventListener("click",closeQP);
+$("qpOk").addEventListener("click",function(){
+  var id=QPREC,n=QPSEL,r=recById(id);closeQP();if(!r)return;
+  var had=S.dishes.indexOf(id)>=0;
+  if(had&&n===getQ(id)){tab("liste");return}
+  snap(had?"Quantité modifiée":"Recette ajoutée");
+  if(addRecipe(r,n)){save();render()}
+  tab("liste");
+});
+var RLP=null,RDR=null,RNC=false;
+function rStart(e){
+  if(e.type==="mousedown"&&e.button!==0)return;
+  var t=e.target;if(!t.closest||t.closest(".radd"))return;
+  var sm=t.closest("#recipes details.rcp>summary");if(!sm)return;
+  var f=sm.parentNode,p=pxy(e);
+  RLP={f:f,x:p.x,y:p.y,t:setTimeout(rBegin,450),w:setTimeout(function(){f.classList.add("wig")},130)};
+}
+function rBegin(){
+  var f=RLP.f,cy=RLP.y;clearTimeout(RLP.w);f.classList.add("wig");
+  document.querySelectorAll("#recipes details.rcp").forEach(function(o){o.open=false});
+  ROPEN={};
+  if(navigator.vibrate)navigator.vibrate(20);
+  f.classList.add("drag");
+  RDR={f:f,sy:cy};RLP=null;
+}
+function rMove(e){
+  var p=pxy(e);
+  if(RLP){if(Math.abs(p.x-RLP.x)>10||Math.abs(p.y-RLP.y)>10){clearTimeout(RLP.t);clearTimeout(RLP.w);RLP.f.classList.remove("wig");RLP=null}else RLP.y=p.y;return}
+  if(!RDR)return;
+  if(e.cancelable)e.preventDefault();
+  var f=RDR.f,cy=p.y;
+  f.style.transform="translateY("+(cy-RDR.sy)+"px)";
+  var box=$("recipes"),list=[].slice.call(box.children),r=f.getBoundingClientRect(),mid=r.top+r.height/2,before=null;
+  for(var i=0;i<list.length;i++){var o=list[i];if(o===f)continue;var q=o.getBoundingClientRect();if(mid<q.top+q.height/2){before=o;break}}
+  if(before===f.nextSibling)return;
+  var tops={};list.forEach(function(o){tops[o.dataset.id]=o.getBoundingClientRect().top});
+  var vt=r.top;
+  box.insertBefore(f,before);
+  f.style.transform="none";
+  var dy=vt-f.getBoundingClientRect().top;
+  f.style.transform="translateY("+dy+"px)";RDR.sy=cy-dy;
+  list.forEach(function(o){if(o===f)return;var d2=tops[o.dataset.id]-o.getBoundingClientRect().top;if(Math.abs(d2)>1)o.animate([{transform:"translateY("+d2+"px)"},{transform:"none"}],{duration:200,easing:"ease-out"})});
+}
+function rEnd(e){
+  if(RLP){clearTimeout(RLP.t);clearTimeout(RLP.w);RLP.f.classList.remove("wig");RLP=null;return}
+  if(!RDR)return;
+  if(e.cancelable)e.preventDefault();
+  var f=RDR.f,tr=f.style.transform;
+  f.style.transform="";f.classList.remove("drag");f.classList.remove("wig");
+  if(!RM)f.animate([{transform:tr},{transform:"none"}],{duration:180,easing:"ease-out"});
+  var ids=[].slice.call($("recipes").children).map(function(o){return o.dataset.id});
+  S.recipes.sort(function(a,b){return ids.indexOf(a.id)-ids.indexOf(b.id)});
+  save();
+  RDR=null;RNC=true;setTimeout(function(){RNC=false},350);
+}
+document.addEventListener("touchstart",rStart,{passive:true});
+document.addEventListener("mousedown",rStart);
+document.addEventListener("touchmove",rMove,{passive:false});
+document.addEventListener("mousemove",rMove);
+document.addEventListener("touchend",rEnd,{passive:false});
+document.addEventListener("touchcancel",rEnd);
+document.addEventListener("mouseup",rEnd);
 var CP=null,CNOCLICK=false,CNAME=null,COPEN=0,CHOLD=false,CSEL=null;
 function openCat(name){
   CNAME=name;COPEN=Date.now();CHOLD=true;
@@ -1214,6 +1298,7 @@ function setCat(name,cat){
   snap("Article déplacé");
   if(h)h.cat=cat;else S.habits.push({id:uid(),name:name,cat:cat,count:0});
   S.list.forEach(function(i){if(norm(i.name)===norm(name))i.cat=cat});
+  S.recipes.forEach(function(r){r.items.forEach(function(it){if(norm(it.name)===norm(name))it.cat=cat})});
   OPEN[cat]=true;save();render();return true;
 }
 $("csCat").addEventListener("change",function(){CSEL=this.value});
@@ -1222,9 +1307,10 @@ document.querySelector("#csheet .qs-back").addEventListener("click",function(){i
 function cStart(e){
   if(e.type==="mousedown"&&e.button!==0)return;
   var t=e.target;if(!t.closest)return;
-  var row=t.closest("#list .li, #chips .opt");if(!row||t.closest(".del,.qty"))return;
+  var row=t.closest("#list .li, #chips .opt, .rbody li");if(!row||t.closest(".del,.qty"))return;
   var name=null;
   if(row.classList.contains("li")){var it=S.list.filter(function(i){return i.id===row.dataset.id})[0];if(it)name=it.name}
+  else if(row.tagName==="LI"){var sp=row.querySelector("span");if(sp)name=sp.textContent}
   else{var inp=row.querySelector("input"),h=S.habits.filter(function(x){return inp&&x.id===inp.dataset.habit})[0];if(h)name=h.name}
   if(!name)return;
   var p=pxy(e);
@@ -1242,8 +1328,8 @@ document.addEventListener("mousemove",cMove);
 document.addEventListener("touchend",cEnd);
 document.addEventListener("touchcancel",cEnd);
 document.addEventListener("mouseup",cEnd);
-document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#list .li,#chips .opt"))e.preventDefault()});
-document.addEventListener("click",function(e){if(CNOCLICK&&e.target.closest&&e.target.closest("#list .li,#chips .opt")){e.preventDefault();e.stopPropagation()}},true);
+document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#list .li,#chips .opt,.rbody li"))e.preventDefault()});
+document.addEventListener("click",function(e){if(CNOCLICK&&e.target.closest&&e.target.closest("#list .li,#chips .opt,.rbody li")){e.preventDefault();e.stopPropagation()}},true);
 var TI=0,TX=0,TY=0;
 function tGo(i){
   var tr=$("ttrack"),n=tr.children.length;
@@ -1289,7 +1375,7 @@ function renderRecipes(){
     var add=el("button","radd","+");add.type="button";add.dataset.act="usereci";add.dataset.id=r.id;add.setAttribute("aria-label","Ajouter "+r.name+" à la liste");
     sm.appendChild(nm);sm.appendChild(add);d.appendChild(sm);
     var body=el("div","rbody"),ul=el("ul");
-    r.items.forEach(function(it){var li=el("li");li.appendChild(el("span",null,it.name));li.appendChild(el("em",null,it.cat));ul.appendChild(li)});
+    r.items.forEach(function(it){var li=el("li");li.appendChild(el("span",null,it.name));var hh=findHabit(it.name);li.appendChild(el("em",null,hh?hh.cat:it.cat));ul.appendChild(li)});
     body.appendChild(ul);
     if(r.note)body.appendChild(el("div","rnote",r.note));
     var act=el("div","ract");
@@ -1393,7 +1479,7 @@ document.addEventListener("click",function(e){
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
   else if(a==="deldish"){removeDish(id)}
   else if(a==="editreci"){editRecipe(id)}
-  else if(a==="usereci"){if(!QNOCLICK)useRecipe(id)}
+  else if(a==="usereci")openQtyPop(id,t)
   else if(a==="delreci"){snap("Recette supprimée");S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
   else if(a==="rpick"){var hh=S.habits.filter(function(x){return x.id===id})[0];if(hh)pushDraft(hh.name,hh.cat)}
   else if(a==="rnew")addDraft();
@@ -1642,7 +1728,7 @@ document.addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape")return;
   $("menu").hidden=true;
-  document.querySelectorAll(".ov").forEach(function(o){o.hidden=true});closeQty();stopScan();
+  document.querySelectorAll(".ov").forEach(function(o){o.hidden=true});closeQty();closeQP();stopScan();
 });
 $("planBack").addEventListener("click",closePlan);
 $("planAdd").addEventListener("click",planToList);
@@ -1752,7 +1838,7 @@ document.addEventListener("touchstart",function(e){
   tx=e.touches[0].clientX;ty=e.touches[0].clientY;
 },{passive:true});
 document.addEventListener("touchend",function(e){
-  if(!tk||DR||document.querySelector("#plan:not([hidden]),.ov:not([hidden]),#qsheet:not([hidden]),#csheet:not([hidden])"))return;
+  if(!tk||DR||document.querySelector("#plan:not([hidden]),.ov:not([hidden]),#qsheet:not([hidden]),#csheet:not([hidden]),#qpop:not([hidden])"))return;
   var c=e.changedTouches[0],dx=c.clientX-tx,dy=c.clientY-ty;
   if(Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.6)return;
   var n=cur+(dx<0?1:-1);if(n>=0&&n<TABS.length)tab(TABS[n]);
