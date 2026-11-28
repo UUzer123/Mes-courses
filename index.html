@@ -560,6 +560,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div id="rImp" hidden>
         <textarea id="impText" rows="3" placeholder="Collez le lien d’une recette, ou sa liste d’ingrédients (un par ligne)"></textarea>
         <button class="main" id="impGo" type="button">Importer</button>
+        <button class="ghost" id="impSearch" type="button" style="margin-top:0">Chercher en ligne</button>
         <div id="impMsg"></div>
       </div>
       <input id="rName" placeholder="Nom de la recette" autocomplete="off">
@@ -1526,7 +1527,6 @@ function frCat(n){
 function ingToItem(line){
   var n=cleanIng(line);if(!n)return null;
   var k=nk(n),h=S.habits.filter(function(x){return nk(x.name)===k})[0];
-  if(!h){var best=null;S.habits.forEach(function(x){var hk=nk(x.name);if(hk.length>=3&&(" "+k+" ").indexOf(" "+hk)>=0&&(!best||hk.length>best.k))best={h:x,k:hk.length}});if(best)h=best.h}
   return h?{name:h.name,cat:h.cat}:{name:n,cat:frCat(n)};
 }
 function ldFind(o){
@@ -1764,6 +1764,36 @@ function hideSplash(){if(sp&&sp.parentNode){sp.parentNode.removeChild(sp);sp=nul
 sp.addEventListener("animationend",function(e){if(e.animationName==="splashOut")hideSplash()});
 sp.addEventListener("click",hideSplash);
 setTimeout(hideSplash,4000);
+
+var SEARCHING=false;
+function urlIn(t){var m=String(t||"").match(/https?:\/\/[^\s"'<>]+/i);return m?m[0]:""}
+$("impSearch").addEventListener("click",function(){
+  var q=$("rName").value.trim();var t=$("impText").value.trim();if(!q&&t&&!urlIn(t))q=t.split("\n")[0].slice(0,60);
+  var u="https://www.google.com/search?q="+encodeURIComponent("recette "+q);
+  SEARCHING=true;$("impMsg").textContent="Copiez le lien de la recette choisie, puis revenez ici.";
+  var w=null;try{w=window.open(u,"_blank","noopener")}catch(e){}
+  if(!w){SEARCHING=false;$("impMsg").textContent="Ouverture impossible ici : cherchez la recette dans votre navigateur puis collez son lien.";}
+});
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden||!SEARCHING||$("rpage").hidden)return;
+  SEARCHING=false;$("rImp").hidden=false;
+  var msg=$("impMsg");msg.textContent="Collez le lien de la recette puis touchez Importer.";
+  if(navigator.clipboard&&navigator.clipboard.readText){
+    navigator.clipboard.readText().then(function(t){
+      var u=urlIn(t);if(u&&!$("rpage").hidden){$("impText").value=u;msg.textContent="Lien copié détecté : touchez Importer."}
+    }).catch(function(){});
+  }
+});
+function handleShare(){
+  var q;try{q=new URLSearchParams(location.search)}catch(e){return}
+  var u=urlIn(q.get("url"))||urlIn(q.get("text"))||urlIn(q.get("title"));
+  if(!u)return;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  if(typeof hideSplash==="function")hideSplash();
+  tab("recettes");openRecipePage(null);
+  $("rImp").hidden=false;$("impText").value=u;doImport();
+}
+handleShare();
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
 </body>
