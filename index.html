@@ -472,7 +472,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </section>
   <section id="v-recettes" hidden>
     <h1>Mes recettes</h1>
-    <p class="sub">Touchez + puis une quantité pour ajouter la recette à votre liste. Maintenez une recette pour la déplacer, ou un ingrédient pour ouvrir sa fiche (note, prix, rayon).</p>
+    <p class="sub">Touchez + pour ajouter le plat à votre liste, touchez-le encore pour en ajouter un autre. Maintenez une recette pour la déplacer, ou un ingrédient pour ouvrir sa fiche (note, prix, rayon).</p>
     <div id="recipes"></div>
     <button class="ghost" id="newRecipeBtn">+ Nouvelle recette</button>
   </section>
@@ -660,7 +660,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <button role="tab" id="t-recettes" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg><span>Recettes</span></button>
 </nav>
 <script>
-var CATS=["Fruits & légumes","Frais","Surgelés","Épicerie","Boissons","Maison","Autre"];
+var CATS=["Fruits & légumes","Frais","Surgelés","Épicerie","Boissons","Maison","Soins & corps","Autre"];
 var S=null;
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function seed(){
@@ -706,6 +706,7 @@ var ICONS={
 "Épicerie":ic('<path d="M5 8h14l-1.2 11a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
 "Boissons":ic('<path d="M10 2h4v4l2 3v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9l2-3z"/><path d="M8 13h8"/>'),
 "Maison":ic('<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>'),
+"Soins & corps":ic('<path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/>'),
 "Autre":ic('<circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/>')
 };
 var RM=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
@@ -1171,6 +1172,12 @@ document.addEventListener("contextmenu",function(e){if(RLP||RDR||(e.target.close
 document.addEventListener("click",function(e){if((QNOCLICK||RNC)&&e.target.closest&&e.target.closest("#recipes summary")){e.preventDefault();e.stopPropagation()}},true);
 
 var QPSEL=1,QPREC=null;
+function addDish(id){
+  var r=recById(id);if(!r)return;
+  var had=S.dishes.indexOf(id)>=0,n=had?Math.min(20,getQ(id)+1):1;
+  snap(n>1?"Plat ajouté à la liste (×"+n+")":"Plat ajouté à la liste");
+  if(addRecipe(r,n)){save();render()}
+}
 function openQtyPop(id,btn){
   var r=recById(id);if(!r)return;
   var had=S.dishes.indexOf(id)>=0;
@@ -1507,7 +1514,7 @@ document.addEventListener("click",function(e){
   else if(a==="qplus"||a==="qminus"){S.list.forEach(function(i){if(i.id===id){var q=(i.qty||1)+(a==="qplus"?1:-1);i.qty=Math.max(1,Math.min(99,q))}});save();render()}
   else if(a==="deldish"){removeDish(id)}
   else if(a==="editreci"){editRecipe(id)}
-  else if(a==="usereci")openQtyPop(id,t)
+  else if(a==="usereci")addDish(id)
   else if(a==="delreci"){snap("Recette supprimée");S.recipes=S.recipes.filter(function(r){return r.id!==id});save();render()}
   else if(a==="rpick"){var hh=S.habits.filter(function(x){return x.id===id})[0];if(hh)pushDraft(hh.name,hh.cat)}
   else if(a==="rnew")addDraft();
@@ -1554,7 +1561,8 @@ function guessCat(tags){
   if(!t)return "Autre";
   if(/frozen|surgel|ice-cream/.test(t))return "Surgelés";
   if(/beverage|boisson|waters|juices|sodas|wines|beers|spirits|coffees|teas/.test(t))return "Boissons";
-  if(/cleaning|household|hygiene|cosmetic|soaps|toilet|detergent|shampoo|toothpaste/.test(t))return "Maison";
+  if(/hygiene|cosmetic|soaps|shampoo|toothpaste|deodorant|body-care|skin-care/.test(t))return "Soins & corps";
+  if(/cleaning|household|toilet|detergent/.test(t))return "Maison";
   if(/fresh-fruits|fresh-vegetables|fruits-et-legumes-frais|fresh-produce/.test(t))return "Fruits & légumes";
   if(/dairies|milks|yogurts|cheeses|eggs|butters|creams|meats|fishes|seafood|charcuterie|sausages|hams|chilled|fresh-/.test(t))return "Frais";
   return "Épicerie";
