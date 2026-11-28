@@ -243,6 +243,7 @@ body.store #dock .addr{display:none}
 .ftab td:last-child{text-align:right;color:var(--muted)}
 .fchips{display:flex;flex-wrap:wrap;gap:6px}
 .fchips span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px}
+.fdel{background:none;border:0;font:inherit;font-size:14px;width:100%;cursor:pointer}
 .flink{display:block;margin-top:20px;text-align:center;color:var(--muted);font-size:14px}
 #sRes>*{flex:none}
 #sRes input{flex:none}
@@ -1526,6 +1527,16 @@ function openFiche(code,cc){
   var nk2=[["kcal","Énergie","kcal"],["fat","Matières grasses","g"],["sat","dont saturées","g"],["sugars","Sucres","g"],["salt","Sel","g"],["prot","Protéines","g"]].filter(function(r){return o.nut&&o.nut[r[0]]!=null});
   if(nk2.length){var tb=el("table","ftab");nk2.forEach(function(r){var tr=el("tr");tr.appendChild(el("td",null,r[1]));tr.appendChild(el("td",null,String(o.nut[r[0]]).replace(".",",")+" "+r[2]));tb.appendChild(tr)});sec("Pour 100 g",tb)}
   var a=el("a","flink","Voir sur Open Food Facts");a.href="https://world.openfoodfacts.org/product/"+encodeURIComponent(code);a.target="_blank";a.rel="noopener";b.appendChild(a);
+  if(!cc){
+    var dl=el("button","flink fdel","Supprimer la fiche");dl.type="button";
+    dl.addEventListener("click",function(){
+      snap("Fiche supprimée");
+      delete S.codes[code];
+      S.habits.forEach(function(x){if(x.code===code)delete x.code});
+      save();$("fiche").hidden=true;render();
+    });
+    b.appendChild(dl);
+  }
   b.appendChild(el("p","flink","Notes issues d’Open Food Facts, base collaborative : elles peuvent différer d’autres applications."));
   openOvl("fiche");
 }
