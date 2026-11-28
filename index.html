@@ -209,13 +209,11 @@ body.store #dock .addr{display:none}
 .recipe{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .dq{color:var(--muted);font-size:.85em;margin-left:6px}
 #qpback{position:fixed;inset:0;z-index:39}
-#qpop{position:fixed;z-index:41;width:116px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 8px;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeIn .15s ease}
+#qpop{position:fixed;z-index:41;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeIn .15s ease}
 #qpop[hidden],#qpback[hidden]{display:none}
-.qpw{position:relative;height:108px}
-.qpw .wsel{top:36px;height:36px;left:6%;right:6%}
-.qpw .wlist{padding:36px 0}
-.qpw .wlist div{height:36px;line-height:36px;font-size:18px}
-.qpw .wlist div.on{font-size:20px}
+#qplist{display:flex;gap:6px}
+#qplist div{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;cursor:pointer}
+#qplist div.on{background:var(--ink);color:var(--on-accent);border-color:var(--ink)}
 #qsheet,#csheet{position:fixed;inset:0;z-index:40}
 #csheet .qs-panel{max-height:92vh;overflow-y:auto}
 .csl select{display:block;font-weight:400;font-size:16px;color:var(--ink);height:46px}
@@ -361,7 +359,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font:inherit;background:var(--chip);color:var(--chip-ink);border:0;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600}
 .folder{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
-.folder summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:16px;font-weight:600;cursor:pointer}
+.folder summary{list-style:none;display:flex;align-items:center;gap:12px;padding:17px 16px;font-size:18px;font-weight:600;cursor:pointer}
 .folder summary .nm{flex:1}
 .folder summary svg{flex:none;color:var(--muted)}
 .folder summary::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform .25s ease,margin .25s ease}
@@ -625,7 +623,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </div>
 <div id="qpback" hidden></div>
 <div id="qpop" hidden role="dialog" aria-label="Quantité">
-  <div class="qpw"><div class="wsel"></div><div class="wlist" id="qplist"></div></div>
+  <div id="qplist"></div>
 </div>
 <div id="qsheet" hidden role="dialog" aria-label="Quantité de la recette">
   <div class="qs-back"></div>
@@ -1178,20 +1176,16 @@ function openQtyPop(id,btn){
   var had=S.dishes.indexOf(id)>=0;
   QPREC=id;QPSEL=had?getQ(id):1;
   var wl=$("qplist");wl.textContent="";
-  for(var i=1;i<=20;i++){var d=el("div",null,String(i));d.dataset.v=String(i);wl.appendChild(d)}
+  for(var i=1;i<=5;i++){var d=el("div",null,String(i));d.dataset.v=String(i);wl.appendChild(d)}
   var pop=$("qpop");$("qpback").hidden=false;pop.hidden=false;
   var rc=btn.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight;
   var left=Math.max(8,Math.min(window.innerWidth-w-8,rc.left-w-6)),top=rc.top+rc.height/2-h/2;
   top=Math.max(8,Math.min(window.innerHeight-h-8,top));
   pop.style.left=left+"px";pop.style.top=top+"px";
-  wl.scrollTop=(QPSEL-1)*36;markQP();
+  markQP();
 }
 function markQP(){[].forEach.call($("qplist").children,function(c){c.classList.toggle("on",+c.dataset.v===QPSEL)})}
 function closeQP(){$("qpop").hidden=true;$("qpback").hidden=true;QPREC=null}
-$("qplist").addEventListener("scroll",function(){
-  var i=Math.max(0,Math.min(19,Math.round(this.scrollTop/36)))+1;
-  if(i!==QPSEL){QPSEL=i;markQP();if(navigator.vibrate)navigator.vibrate(4)}
-});
 $("qplist").addEventListener("click",function(e){var d=e.target.closest("[data-v]");if(d)qpValidate(+d.dataset.v)});
 $("qpback").addEventListener("click",closeQP);
 function qpValidate(n){
